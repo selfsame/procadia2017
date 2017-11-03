@@ -1,0 +1,6 @@
+[submodule "Assets/Assets/Arcadia"]
+	path = Assets/Assets/Arcadia
+	url = http://github.com/arcadia-unity/Arcadia
+[submodule "Assets/Arcadia"]
+	path = Assets/Arcadia
+	url = http://github.com/arcadia-unity/Arcadia
