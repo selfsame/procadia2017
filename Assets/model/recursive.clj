@@ -16,8 +16,34 @@
     (:import
       [UnityEngine Debug Resources GameObject PrimitiveType
        Application Color Input Screen Gizmos Camera Component Vector3 Mathf Quaternion]
-      ArcadiaState
-      Hard.Helper))
+       ArcadiaState
+       Hard.Helper))
+
+(defn walk-gos
+  "Recursively calls the specified function on the provided GameObject
+   and then all child gameobjects, in a depth-first fashion (i.e., walks
+   the first child, then the children of the first child, before moving on
+   to the second child.
+   --
+   Calls (func go ~@args) on each one.
+   --
+   Returns nothing. This should be called for side effects only...
+   --
+   TODO: Consider only calling this on ACTIVE game objects?
+   "
+  [^GameObject go func & args]
+  ;; First call the function on the current GameObject
+  (apply func go args)
+  ;; Now get all the child objects
+  (let [t (.transform go)
+        num-children (.childCount t)]
+    (loop [child-num 0]
+      (when (< child-num num-children)
+        (let [child-t (.GetChild t child-num)
+              child (.gameObject child-t)]
+          (apply walk-gos child func args)
+          (recur (inc child-num)))))))
+
 
 (defn recursive-call
   "Given a GameObject, it will look for the associated data
@@ -26,22 +52,66 @@
    the appropriate method key, and finally, which if that is
    a function, will call it with the arguments. Then, it will
    look at all the child GameObjects of that object and repeat the
-   process all over again."
+   process all over again.
+   --
+   The function is called as (func game-object method-keyword ~@args)
+   "
   [go method & args]
-  (Debug/Log "This is a debugging message."))
+  (Debug/Log (str "Object: " (.name go) ", Data: " (hard/data go))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Testing scene stuff
 
-(def root-object-name
-  "Root")
+;; To set up the testing scene, load it in Unity, start the
+;; Arcadia REPL, then:
+#_(do
+  (require '[model.recursive :reload true])
+  (in-ns 'model.recursive)
+  (setup-hooks)
+)
+;; Then verify that the hook is shown on the Main Camera
 
-(defn test-scene-update
-  [^GameObject go k]
-  (Debug/Log (str "Update called on " go)))
+(def root-object-name "Root")
 
-(defn setup-hooks
+(def main-camera-name "Main Camera")
+
+(def was-data-setup
+  "Was the data set up on our test scene objects yet?"
+  (volatile! false))
+
+(defn data-setup
+  "Sets up the data on the game object with a single :update :fns."
+  [ro]
+  (hard/data! ro
+    {:fns {:update (fn [go meth & args]
+                       (Debug/Log (str ":fns " meth " on " (.name go) " with " args)))}}))
+
+(defn data-setup-all
+  "Sets up the data on all game objects starting at the root, recursively."
   []
   (let [ro (GameObject/Find root-object-name)]
-    (a/hook+ ro :update nil #'test-scene-update)))
+    ;; TODO: Make this recursive
+    (data-setup ro)))
+
+(defn test-scene-update
+  "A per-frame update of the whole scene. Attach this to the MainCamera
+   for example, and hook it to :update."
+  [^GameObject go k]
+  (Debug/Log (str "Update called on " go " with k of " k))
+  ;; Set up our data objects the first time
+  (when-not @was-data-setup
+    (Debug/Log "Setting up data...")
+    (data-setup-all)
+    (vreset! was-data-setup true))
+  ;; Do an update of all the data in the Root GameObject
+  (let [go (GameObject/Find root-object-name)]
+    (recursive-call go :update :plus :some :args)))
+
+(defn setup-hooks
+  "Set up the hooks for our test scene. This needs to be called
+   once when the scene is created, by the REPL."
+  []
+  (let [ro (GameObject/Find main-camera-name)]
+    ;; Not really sure what the point of k is.
+    (a/hook+ ro :update :none #'test-scene-update)))
