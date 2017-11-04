@@ -1,3 +1,8 @@
+;; Copyright © 2017 Douglas P. Fields, Jr. Some Rights Reserved.
+;; Web: https://symbolics.lisp.engineer/
+;; E-mail: symbolics@lisp.engineer
+;; Twitter: @LispEngineer
+
 (ns model.recursive
     "Recursive functionality for calling functions attached to
      Unity GameObjects.
@@ -8,7 +13,10 @@
      the appropriate method key, and finally, which if that is
      a function, will call it with the arguments. Then, it will
      look at all the child GameObjects of that object and repeat the
-     process all over again."
+     process all over again.
+
+     Author: Douglas P. Fields, Jr.
+    "
     (:require [arcadia.core :as a]
               arcadia.linear
               [clojure.string :as str]
@@ -37,6 +45,7 @@
   ;; Now get all the child objects
   (let [t (.transform go)
         num-children (.childCount t)]
+    #_(Debug/Log (str "Object " (.name go) " has " num-children " children"))
     (loop [child-num 0]
       (when (< child-num num-children)
         (let [child-t (.GetChild t child-num)
@@ -44,6 +53,8 @@
           (apply walk-gos child func args)
           (recur (inc child-num)))))))
 
+;; Test of the above:
+#_(walk-gos (GameObject/Find "Root") #(Debug/Log (.name %)))
 
 (defn recursive-call
   "Given a GameObject, it will look for the associated data
@@ -55,9 +66,24 @@
    process all over again.
    --
    The function is called as (func game-object method-keyword ~@args)
+   --
+   Example:
+   (recursive-call root-game-object :update 37 ...)
+   will call the {:fn {:update #'func}} on root-game-object's hard/data and each
+   of its hierarchical children game objects, with the args like:
+   (#'func current-game-object :update 37 ...)
+   --
+   TODO: Make a version which uses Arcadia GameObject state instead?
    "
   [go method & args]
-  (Debug/Log (str "Object: " (.name go) ", Data: " (hard/data go))))
+  (walk-gos go
+    (fn [igo & args]
+      (let [data (hard/data igo)]
+        (when (and (map? data)
+                   (map? (:fns data))
+                   (ifn? (get-in data [:fns method])))
+          (apply (get-in data [:fns method]) igo method args))))))
+  ;; (Debug/Log (str "Object: " (.name go) ", Data: " (hard/data go))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -66,11 +92,13 @@
 ;; To set up the testing scene, load it in Unity, start the
 ;; Arcadia REPL, then:
 #_(do
+  ;; The below crashes my REPL (using Ruby REPL with rlwrap) for some reason
   (require '[model.recursive :reload true])
+  ;; So restart the REPL after that and continue...
   (in-ns 'model.recursive)
   (setup-hooks)
 )
-;; Then verify that the hook is shown on the Main Camera
+;; Then verify that the hook is shown on the Main Camera in the Unity Editor
 
 (def root-object-name "Root")
 
@@ -90,15 +118,15 @@
 (defn data-setup-all
   "Sets up the data on all game objects starting at the root, recursively."
   []
-  (let [ro (GameObject/Find root-object-name)]
-    ;; TODO: Make this recursive
-    (data-setup ro)))
+  ;; #'data-setup would work as well as data-setup
+  ;; but works better if we expect that var (function) to change.
+  (walk-gos (GameObject/Find root-object-name) data-setup))
 
 (defn test-scene-update
   "A per-frame update of the whole scene. Attach this to the MainCamera
    for example, and hook it to :update."
   [^GameObject go k]
-  (Debug/Log (str "Update called on " go " with k of " k))
+  #_(Debug/Log (str "Update called on " go " with k of " k))
   ;; Set up our data objects the first time
   (when-not @was-data-setup
     (Debug/Log "Setting up data...")
