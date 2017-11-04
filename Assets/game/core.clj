@@ -8,6 +8,7 @@
 
 (defn start [_ _]
   (clear-cloned!)
+  (clone! :iso-camera)
   (let [world (game.world/make-world :worlds/cubeworld 40 40)
         spawn-points (game.world/spawn-points)
         player (clone! :player)]
