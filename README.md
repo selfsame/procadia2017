@@ -10,6 +10,6 @@
 
 * Joseph Parker - GitHub selfsame
 * Douglas P. Fields, Jr. - GitHub LispEngineer
-* Josh `_______` - GitHub IGJoshua
+* Joshua Suskalo - GitHub IGJoshua
 
 
