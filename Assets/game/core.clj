@@ -6,15 +6,12 @@
   (require
     [game.world]))
 
-(def spawn (atom nil))
-
 (defn start [_ _]
   (clear-cloned!)
-  (let [world (game.world/make-world :worlds/cubeworld 30 30)
-        spawn-points (shuffle (objects-tagged "spawn"))
+  (let [world (game.world/make-world :worlds/cubeworld 40 40)
+        spawn-points (game.world/spawn-points)
         player (clone! :player)]
-    (reset! spawn (first spawn-points))
-    (position! player (.position (.transform @spawn)))))
+    (position! player (.position (.transform (first spawn-points))))))
 
 '(start nil nil)
 

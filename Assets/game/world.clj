@@ -17,7 +17,8 @@
    :hp 10})
 
 
-
+(defn spawn-points []
+  (remove null-obj? (shuffle (objects-tagged "spawn"))))
 
 (defn make-world [k w h]
   (let [input (clone! k)
