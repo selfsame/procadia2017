@@ -25,24 +25,25 @@
           (recur (rest xs) (+ acc (last (first xs))))))))
 
 
-(defn attach [mount m]
-  (when-let [obj (clone! (:prefab m))]
-    (parent! obj mount)
-    (position! obj (>v3 mount))
-    (rotation! obj (.rotation (.transform mount)))
-    (dorun
-      (map 
-        (fn [[k v]]
-          (when-let [mount (child-named obj (name k))]
-            (when-let [m (srand-nth (vec (parts-typed (probability v))))]
-              (attach mount m))))
-        (:mount-points m)))))
+(defn attach [mount m budget]
+  (when (pos? budget)
+    (when-let [obj (clone! (:prefab m))]
+      (parent! obj mount)
+      (position! obj (>v3 mount))
+      (rotation! obj (.rotation (.transform mount)))
+      (dorun
+        (map 
+          (fn [[k v]]
+            (when-let [mount (child-named obj (name k))]
+              (when-let [m (srand-nth (vec (parts-typed (probability v))))]
+                (attach mount m (dec budget)))))
+          (:mount-points m))))))
 
-(defn make-entity [budget]
+(defn make-entity [start-type budget]
   (let [root (clone! :entity)
         parts (atom [])]
-    (when-let [start (srand-nth (vec (parts-typed :body)))]
-      (attach root start))
+    (when-let [start (srand-nth (vec (parts-typed start-type)))]
+      (attach root start budget))
     root))
 
 
@@ -68,4 +69,5 @@
   :prefab :parts/business-arm})
 
 '(do (clear-cloned!)
-  (make-entity 0))
+  (make-entity :body 2)
+  )
