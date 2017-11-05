@@ -215,7 +215,7 @@
 
 (defn look-at! 
   ([a b] (.LookAt (->transform a) (->v3 b)))
-  ([a b c] (.LookAt (->transform a) (->v3 b) (->v3 b))))
+  ([a b c] (.LookAt (->transform a) (->v3 b) (->v3 c))))
 
 (defn look-quat [a b]
   (Quaternion/LookRotation  (->v3 (arcadia.linear/v3- (->v3 b) (->v3 a)))))
