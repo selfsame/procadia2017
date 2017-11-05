@@ -19,8 +19,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4878176696592290}
-  - component: {fileID: 114288689266105780}
-  - component: {fileID: 114491402628334894}
   m_Layer: 0
   m_Name: player-input
   m_TagString: Untagged
@@ -41,32 +39,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114288689266105780
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1676263287896124}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68bab27575ee84411b029b5f5e98734f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  edn: '{:output-obj #unity/Object 0, :raycast-layer 30}'
-  objectDatabaseIds: 00000000
-  objectDatabaseObjects:
-  - {fileID: 0}
---- !u!114 &114491402628334894
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1676263287896124}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32c8aedeab7cb421da9a055c86933987, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  edn: '[{:arcadia.internal.hook-help/key :poll-input, :arcadia.internal.hook-help/fn
-    #''input.core/push-input!, :arcadia.internal.hook-help/pamv-data [:poll-input]}]'
-  arcadiaState: {fileID: 114288689266105780}

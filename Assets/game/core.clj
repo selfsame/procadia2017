@@ -25,7 +25,7 @@
           (.transform @CAMERA-AXIS) 
           (v3 (.x movement) 0 (.y movement)))
         rb (->rigidbody o)
-        vel (v3* (v3 (.x movement) -1 (.z movement)) 30)]
+        vel (v3* (v3 (.x movement) -0.5 (.z movement)) 30)]
     (set! (.velocity rb) vel)
     (position! @AIM mouse-intersection)
     (look-at! o (v3+ (>v3 o) (v3 (.x aim) 0 (.y aim))) (v3 0 1 0))))
@@ -49,6 +49,7 @@
     (reset! CAMERA camera)
     (reset! CAMERA-AXIS (first (children camera)))
     (reset! AIM (clone! :cube))
+    (hook+ player-input :update #'input.core/push-input!)
     (state+ player-input :output-obj player)
     (position! player (.position (.transform (first spawn-points))))
     (hook+ player :update #'update-player)
@@ -62,8 +63,5 @@
 '(start nil nil)
 
 '(hook+ (the start) :start :start #'start)
-
-
-
-
+'(hook+ (the player-input) :update #'input.core/push-input!)
 
