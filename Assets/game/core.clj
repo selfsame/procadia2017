@@ -16,6 +16,7 @@
 
 (defn make-level [depth]
   (let [world (game.world/make-world :worlds/cubeworld 40 40)
+        _ (local-scale! world (v3 2))
         spawn-points (game.world/spawn-points)
         player (game.entity/make-entity (* depth 10))
         monsters 
@@ -39,4 +40,8 @@
 '(start nil nil)
 
 '(hook+ (the start) :start :start #'start)
+
+
+
+
 
