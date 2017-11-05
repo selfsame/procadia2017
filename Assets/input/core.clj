@@ -39,6 +39,7 @@
    :aim (.normalized (lin/v2- (let [pos (get-mouse-on-plane! player-pos)]
                                 (lin/v2 (.x pos) (.z pos)))
                               (lin/v2 (.x player-pos) (.z player-pos))))
+   :mouse-intersection (get-mouse-on-plane! player-pos)
    :buttons-down (get-buttons #(Input/GetMouseButtonDown %) input-buttons)
    :buttons-pressed (get-buttons #(Input/GetMouseButton %) input-buttons)
    :buttons-up (get-buttons #(Input/GetMouseButtonUp %) input-buttons)})
