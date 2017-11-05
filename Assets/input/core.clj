@@ -36,11 +36,9 @@
                               (Input/GetAxisRaw (input-axes :vertical))))
    ;; TODO: update aim to use a raycast from the camera through the mouse rather
    ;; than a direct mouse position, so that aiming doesn't care about camera angle
-   :aim (get-mouse-on-plane! player-pos)
-
-   #_(.normalized (lin/v2- (let [pos (.ScreenToWorldPoint Camera/main Input/mousePosition)]
-                                (lin/v2 (.x pos) (.y pos)))
-                              (lin/v2 (.x player-pos) (.y player-pos))))
+   :aim (.normalized (lin/v2- (let [pos (get-mouse-on-plane! player-pos)]
+                                (lin/v2 (.x pos) (.z pos)))
+                              (lin/v2 (.x player-pos) (.z player-pos))))
    :buttons-down (get-buttons #(Input/GetMouseButtonDown %) input-buttons)
    :buttons-pressed (get-buttons #(Input/GetMouseButton %) input-buttons)
    :buttons-up (get-buttons #(Input/GetMouseButtonUp %) input-buttons)})
