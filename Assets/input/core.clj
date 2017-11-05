@@ -32,17 +32,17 @@
 
 (defn update-input-state!
   [old-state player-pos]
-  {:movement (.normalized (lin/v2 (Input/GetAxisRaw (input-axes :horizontal))
-                              (Input/GetAxisRaw (input-axes :vertical))))
-   ;; TODO: update aim to use a raycast from the camera through the mouse rather
-   ;; than a direct mouse position, so that aiming doesn't care about camera angle
-   :aim (.normalized (lin/v2- (let [pos (get-mouse-on-plane! player-pos)]
-                                (lin/v2 (.x pos) (.z pos)))
-                              (lin/v2 (.x player-pos) (.z player-pos))))
-   :mouse-intersection (get-mouse-on-plane! player-pos)
-   :buttons-down (get-buttons #(Input/GetMouseButtonDown %) input-buttons)
-   :buttons-pressed (get-buttons #(Input/GetMouseButton %) input-buttons)
-   :buttons-up (get-buttons #(Input/GetMouseButtonUp %) input-buttons)})
+  (let [mouse-intersect (get-mouse-on-plane! player-pos)]
+    {:movement (.normalized (lin/v2 (Input/GetAxisRaw (input-axes :horizontal))
+                                    (Input/GetAxisRaw (input-axes :vertical))))
+     ;; TODO: update aim to use a raycast from the camera through the mouse rather
+     ;; than a direct mouse position, so that aiming doesn't care about camera angle
+     :aim (.normalized (lin/v2- (lin/v2 (.x mouse-intersect) (.z mouse-intersect))
+                                (lin/v2 (.x player-pos) (.z player-pos))))
+     :mouse-intersection mouse-intersect
+     :buttons-down (get-buttons #(Input/GetMouseButtonDown %) input-buttons)
+     :buttons-pressed (get-buttons #(Input/GetMouseButton %) input-buttons)
+     :buttons-up (get-buttons #(Input/GetMouseButtonUp %) input-buttons)}))
 
 (defn push-input!
   "A function that grabs a referenced object from this object's state atom and updates its state to include input from the player this frame.
