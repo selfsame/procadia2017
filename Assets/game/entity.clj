@@ -24,6 +24,10 @@
           (ffirst xs)
           (recur (rest xs) (+ acc (last (first xs))))))))
 
+(defn child-with-name
+  "shallow child-named"
+  [obj n]
+  (->> obj children (filter #(= (.name %) n)) first))
 
 (defn attach [mount m budget]
   (when (pos? budget)
@@ -34,7 +38,7 @@
       (dorun
         (map 
           (fn [[k v]]
-            (when-let [mount (child-named obj (name k))]
+            (when-let [mount (child-with-name obj (name k))]
               (when-let [m (srand-nth (vec (parts-typed (probability v))))]
                 (attach mount m (dec budget)))))
           (:mount-points m))))))
