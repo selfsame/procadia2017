@@ -1,4 +1,4 @@
-﻿  Shader "Example/Diffuse Bump" {
+﻿  Shader "Vertex/Shadow/Diffuse/Bump" {
     Properties {
       
       _MainTex ("Texture", 2D) = "white" {}

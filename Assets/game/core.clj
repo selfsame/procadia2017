@@ -5,6 +5,7 @@
     hard.core
     hard.physics)
   (require
+    input.core
     game.world
     game.entity))
 
