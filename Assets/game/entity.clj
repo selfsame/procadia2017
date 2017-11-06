@@ -35,6 +35,7 @@
       (parent! obj mount)
       (position! obj (>v3 mount))
       (rotation! obj (.rotation (.transform mount)))
+      (local-scale! obj (local-scale mount))
       (dorun
         (map 
           (fn [[k v]]
@@ -43,12 +44,14 @@
                 (attach mount m (dec budget)))))
           (:mount-points m))))))
 
-(defn make-entity [start-type budget]
-  (let [root (clone! :entity)
-        parts (atom [])]
-    (when-let [start (srand-nth (vec (parts-typed start-type)))]
-      (attach root start budget))
-    root))
+(defn make-entity 
+  ([budget] (make-entity :body budget))
+  ([start-type budget]
+    (let [root (clone! :entity)
+          parts (atom [])]
+      (when-let [start (srand-nth (vec (parts-typed start-type)))]
+        (attach root start budget))
+      root)))
 
 
 (part {
@@ -71,6 +74,11 @@
   :type :arm
   :id :business
   :prefab :parts/business-arm})
+
+(part {
+  :type :head
+  :id :eyeball
+  :prefab :parts/eyeball})
 
 '(do (clear-cloned!)
   (make-entity :body 2)

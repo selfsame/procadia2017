@@ -29,7 +29,7 @@
         vel (v3* (v3 (.x movement) -0.5 (.z movement)) 30)]
     (set! (.velocity rb) vel)
     (position! @AIM mouse-intersection)
-    (look-at! o (v3+ (>v3 o) (v3 (.x aim) 0 (.y aim))) (v3 0 1 0))))
+    (lerp-look! o (v3+ (>v3 o) (v3 (.x aim) 0 (.y aim))) 0.4)))
 
 (defn make-level [depth]
   (let [world (game.world/make-world :worlds/cubeworld 40 40)
