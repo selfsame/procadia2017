@@ -3,40 +3,25 @@
     arcadia.core
     arcadia.linear
     hard.core
-    hard.physics)
+    hard.physics
+    game.data)
   (require
     input.core
     game.world
-    game.entity))
-
-(def PLAYER (atom nil))
-(def CAMERA (atom nil))
-(def CAMERA-AXIS (atom nil))
-(def AIM (atom nil))
+    game.entity
+    selfsame))
 
 (defn update-camera [o _]
   (position! o 
     (lerp (>v3 o)
           (v3+ (>v3 @PLAYER) (v3 -50 70 -50)) 0.1)))
 
-(defn update-player [o _]
-  (let [{:keys [movement aim mouse-intersection]} (state o :input)
-        movement 
-        (.TransformDirection 
-          (.transform @CAMERA-AXIS) 
-          (v3 (.x movement) 0 (.y movement)))
-        rb (->rigidbody o)
-        vel (v3* (v3 (.x movement) -0.5 (.z movement)) 30)]
-    (set! (.velocity rb) vel)
-    (position! @AIM mouse-intersection)
-    (lerp-look! o (v3+ (>v3 o) (v3 (.x aim) 0 (.y aim))) 0.4)))
-
 (defn make-level [depth]
   (let [world (game.world/make-world :worlds/cubeworld 40 40)
         _ (local-scale! world (v3 2))
         spawn-points (game.world/spawn-points)
         player-input (clone! :player-input)
-        player (clone! :player)
+        player (game.entity/make-entity (* depth 10))
         monsters 
         (dorun 
           (map 
@@ -53,7 +38,6 @@
     (hook+ player-input :update #'input.core/push-input!)
     (state+ player-input :output-obj player)
     (position! player (.position (.transform (first spawn-points))))
-    (hook+ player :update #'update-player)
     (hook+ camera :update #'update-camera)))
 
 (defn start [_ _]

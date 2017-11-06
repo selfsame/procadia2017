@@ -8,9 +8,23 @@ ModelImporter:
     100000: //RootNode
     100002: Cube
     100004: eyeball
+    100006: Bone
+    100008: Bone_001
+    100010: Bone_002
+    100012: Bone_003
+    100014: boots
+    100016: boots-arm
+    100018: body-bone
     400000: //RootNode
     400002: Cube
     400004: eyeball
+    400006: Bone
+    400008: Bone_001
+    400010: Bone_002
+    400012: Bone_003
+    400014: boots
+    400016: boots-arm
+    400018: body-bone
     2300000: //RootNode
     2300002: Cube
     2300004: eyeball
@@ -19,8 +33,11 @@ ModelImporter:
     3300004: eyeball
     4300000: eyeball
     4300002: Cube
+    4300004: boots
     7400000: Default Take
+    7400002: walk
     9500000: //RootNode
+    13700000: boots
   materials:
     importMaterials: 1
     materialName: 0

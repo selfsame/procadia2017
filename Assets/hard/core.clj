@@ -227,8 +227,6 @@
         res (Quaternion/Lerp aq lq (float v))]
     (set! (.rotation at) res)))
 
- 
-
 
 (defn parent-component [thing sym]
   (when-not (string? sym)
