@@ -54,7 +54,7 @@
       0 col)))
 
 (defn probability-4
-  "DPF reimplementation #3 - destructured"
+  "DPF reimplementation #3 - destructured. This is the fastest by about 10% over -1"
   [col]
   (let [total (reduce + (vals col))
         roll (srand total)]
@@ -65,8 +65,7 @@
           part
           (recur xs new-acc))))))
 
-
-(def probability probability-1)
+(def probability probability-4)
 
 (defn child-with-name
   "shallow child-named"
@@ -150,14 +149,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Benchmarking code - DPF
 
+(defmacro safe-n-timing
+  "This is required because using too high an N will cause a spurious
+   System.NullReferenceException. Hypothesis: Mono cannot keep up with
+   the garbage created by ClojureCLR."
+  [n func]
+  `(try
+    (bench/n-timing ~n ~func)
+    (catch System.Exception e# -1.0)))
+
 (defn bench1 []
-  (let [n 4000000
+  (let [n 500000
         input {:arm 10 :leg 5 :belt 2 :head 1}
-        b1 (bench/n-timing n (probability-1 input))
-        ; b2 (bench/n-timing n (probability-2 input))
-        b3 (bench/n-timing n (probability-3 input))
-        b4 (bench/n-timing n (probability-4 input))]
-    [b1 #_b2 b3 b4]))
+        b1 (safe-n-timing n (probability-1 input))
+        b2 (bench/n-timing n (probability-2 input))
+        b3 (safe-n-timing n (probability-3 input))
+        b4 (safe-n-timing n (probability-4 input))]
+    [b1 b2 b3 b4]))
     ;
     ; {
     ;  :probability-1
