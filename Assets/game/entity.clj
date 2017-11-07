@@ -7,6 +7,8 @@
 
 (def PARTS (atom {}))
 
+(deftype ^:once PartHook [^clojure.lang.IFn hook ^UnityEngine.GameObject part])
+
 (defn part [{:keys [prefab type mount-points hooks state id] :as part-map}]
   (let [id (or id (hash (dissoc part-map :hooks)))
         part-map (assoc part-map :id id)]
@@ -29,49 +31,69 @@
   [obj n]
   (->> obj children (filter #(= (.name %) n)) first))
 
-(defn attach [mount m budget]
+(defn attach [mount m budget parts]
   (when (pos? budget)
     (when-let [obj (clone! (:prefab m))]
+      (swap! parts conj (assoc m :object obj))
       (parent! obj mount)
       (position! obj (>v3 mount))
       (rotation! obj (.rotation (.transform mount)))
+      (local-scale! obj (local-scale mount))
       (dorun
         (map 
           (fn [[k v]]
-            (when-let [mount (child-with-name obj (name k))]
+            (when-let [mount (child-named obj (name k))]
               (when-let [m (srand-nth (vec (parts-typed (probability v))))]
-                (attach mount m (dec budget)))))
+                (attach mount m (dec budget) parts))))
           (:mount-points m))))))
 
-(defn make-entity [start-type budget]
-  (let [root (clone! :entity)
-        parts (atom [])]
-    (when-let [start (srand-nth (vec (parts-typed start-type)))]
-      (attach root start budget))
-    root))
+(defn extract-hooks [m]
+  (let [obj (:object m)]
+    (into {} 
+      (map 
+        (fn [[k v]] [k [(PartHook. v obj)]])
+        (:hooks m)))))
+
+(defn update-vals [m f]
+  (into {} (map (fn [[k v]] [k (f v)]) m)))
+
+(defn entity-update [^UnityEngine.GameObject o _]
+  (let [input (state o :input)]
+    (dorun 
+      (map 
+        (fn [ph]
+          ((.hook ph) o (.part ph)))
+        (:update (state o ::hooks))))
+    (dorun 
+      (map 
+        (fn [ph]
+          ((.hook ph) o (.part ph) (:movement input)))
+        (:move (state o ::hooks))))
+    (dorun 
+      (map 
+        (fn [ph]
+          ((.hook ph) o (.part ph) (:mouse-intersection input)))
+        (:aim (state o ::hooks))))))
+
+(defn make-entity 
+  ([budget] (make-entity :feet budget))
+  ([start-type budget]
+    (let [root (clone! :entity)
+          parts (atom [])]
+      (when-let [start (srand-nth (vec (parts-typed start-type)))]
+        (attach root start budget parts))
+      (state+ root ::parts @parts)
+      (state+ root ::hooks 
+        (update-vals 
+          (reduce 
+            (fn [xs m] (merge-with concat xs (extract-hooks m)))
+            {} @parts) #(into-array PartHook %)))
+      (hook+ root :update ::update #'entity-update)
+      root)))
 
 
-(part {
-  :type :body
-  :id :business
-  :prefab :parts/business-body
-  :mount-points {
-    :neck {:head 1}
-    :left-arm {:arm 1 :head 1}
-    :right-arm {:arm 1 :head 1}
-  } 
-  :hooks {:aim (fn [root this aim])}})
 
-(part {
-  :type :head
-  :id :business
-  :prefab :parts/business-head})
 
-(part {
-  :type :arm
-  :id :business
-  :prefab :parts/business-arm})
-
-'(do (clear-cloned!)
-  (make-entity :body 2)
-  )
+'(do 
+  (clear-cloned!)
+  (def ph (state (make-entity :feet 3))))
