@@ -95,8 +95,16 @@
         (fn [[k v]] [k [(PartHook. v obj)]])
         (:hooks m)))))
 
-(defn update-vals [m f]
+(defn update-vals-1 [m f]
   (into {} (map (fn [[k v]] [k (f v)]) m)))
+
+(defn update-vals-2
+  "DPF Reimplementation #1 of update-vals-1 using reduce-kv and transients
+   (vastly faster, like 7x)"
+  [m f]
+  (persistent! (reduce-kv (fn [m k v] (assoc! m k (f v))) (transient {}) m)))
+
+(def update-vals update-vals-2)
 
 (defn entity-update [^UnityEngine.GameObject o _]
   (let [input (state o :input)]
@@ -158,22 +166,23 @@
     (bench/n-timing ~n ~func)
     (catch System.Exception e# -1.0)))
 
-(defn bench1 []
+(defn bench1
+  "Benchmark probability-# functions"
+  []
   (let [n 500000
         input {:arm 10 :leg 5 :belt 2 :head 1}
         b1 (safe-n-timing n (probability-1 input))
-        b2 (bench/n-timing n (probability-2 input))
+        b2 (safe-n-timing n (probability-2 input))
         b3 (safe-n-timing n (probability-3 input))
         b4 (safe-n-timing n (probability-4 input))]
     [b1 b2 b3 b4]))
-    ;
-    ; {
-    ;  :probability-1
-    ;  ;; 2 is very slow so omit for now
-    ; ;  :probability-2
-    ; ;  (bench/n-timing n (probability-2 input))
-    ;  :probability-3
-    ;  (bench/n-timing n (probability-3 input))
-    ;  :probability-4
-    ;  (bench/n-timing n (probability-4 input))
-    ; }))
+
+(defn bench2
+  "Benchmark update-vals functions"
+  []
+  (let [n 250000
+        input {:a 1 :b 2 :c 3 :d 4}
+        func inc
+        b1 (safe-n-timing n (update-vals-1 input func))
+        b2 (safe-n-timing n (update-vals-2 input func))]
+    [b1 b2]))
