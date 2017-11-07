@@ -14,7 +14,7 @@
   "Returns a set of keys from the map bttns.
    The returned keys have values which return a truthy value when passed to fun."
   [fun bttns]
-  (set (map first
+  (into #{} (map first
             (filter
              (fn [[key val]] val)
              (map (fn [[key val]] [key (fun val)])

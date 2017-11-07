@@ -6,7 +6,10 @@
     hard.physics
     hard.animation
     game.entity
-    game.data)
+    game.data
+    tween.core)
+  (require
+    [magic.api :as m])
   (import 
     Bone
     [UnityEngine Mathf Time GameObject]))
@@ -53,6 +56,19 @@
   :hooks {:update #'body-update}})
 
 (part {
+  :type :body
+  :id :blob
+  :prefab :parts/blob
+  :mount-points {
+    :arm1 {:arm 1}
+    :arm2 {:arm 1}
+    :arm3 {:arm 1}
+    :arm4 {:arm 1}
+    :arm5 {:arm 1}
+    :arm6 {:arm 1}} 
+  :hooks {:update #'body-update}})
+
+(part {
   :type :head
   :id :business
   :prefab :parts/business-head
@@ -79,6 +95,15 @@
   :prefab :parts/rag-tentacle-k})
 
 
+(defn kino-settle [^UnityEngine.GameObject o _]
+  (let [root (.. o transform root gameObject)
+        rb (cmpt root UnityEngine.Rigidbody)]
+    (set! (.isKinematic rb) true)
+    (timeline*
+      (wait 0.2)
+      #(do (set! (.isKinematic rb) false) nil))))
+
+
 (defn attach-rb [o _]
   (let [root (.. o transform root gameObject)
         rb (cmpt root UnityEngine.Rigidbody)
@@ -87,9 +112,9 @@
     (set! (.isKinematic (->rigidbody o)) false)
     (set! (.connectedBody hj) rb)))
 
-(defn kino-match [^UnityEngine.GameObject o _]
-  (set! (.position (.transform o)) (.position (.transform (parent o))))
-  (set! (.rotation (.transform o)) (.rotation (.transform (parent o))))
+(m/defn kino-match [^UnityEngine.GameObject o _]
+  ;(set! (.position (.transform o)) (.position (.transform (.parent (.transform o)))))
+  ;(set! (.rotation (.transform o)) (.rotation (.transform (.parent (.transform o)))))
   )
 
 '(do
@@ -116,6 +141,6 @@
 
     ))
 
-'(hook+ (the rag-tentacle) :start #'attach-rb)
+'(hook+ (the blob) :start #'kino-settle)
 
 '(hook+ (the rag-tentacle-k) :update #'kino-match)
