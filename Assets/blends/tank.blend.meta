@@ -1,0 +1,231 @@
+fileFormatVersion: 2
+guid: df6b265c194cf46899698b5cb228c878
+timeCreated: 1510022509
+licenseType: Free
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: Axel1L
+    100002: Axel2L
+    100004: Axel3L
+    100006: Body
+    100008: Plane_004
+    100010: Plane_005
+    100012: Plane_006
+    100014: //RootNode
+    100016: TreadL
+    100018: TrreadR
+    100020: Wheel1L
+    100022: Wheel1R
+    100024: Wheel2L
+    100026: Wheel2R
+    100028: Wheel3L
+    100030: Wheel3R
+    100032: Wheel4L
+    100034: Wheel4R
+    100036: Wheel5L
+    100038: Wheel5R
+    100040: Wheel6L
+    100042: Wheel6R
+    100044: Wheel7L
+    100046: Wheel7R
+    100048: Wheel8L
+    100050: Wheel8R
+    100052: TreadL_001
+    100054: Axel1R
+    100056: Axel2R
+    100058: Axel3R
+    400000: Axel1L
+    400002: Axel2L
+    400004: Axel3L
+    400006: Body
+    400008: Plane_004
+    400010: Plane_005
+    400012: Plane_006
+    400014: //RootNode
+    400016: TreadL
+    400018: TrreadR
+    400020: Wheel1L
+    400022: Wheel1R
+    400024: Wheel2L
+    400026: Wheel2R
+    400028: Wheel3L
+    400030: Wheel3R
+    400032: Wheel4L
+    400034: Wheel4R
+    400036: Wheel5L
+    400038: Wheel5R
+    400040: Wheel6L
+    400042: Wheel6R
+    400044: Wheel7L
+    400046: Wheel7R
+    400048: Wheel8L
+    400050: Wheel8R
+    400052: TreadL_001
+    400054: Axel1R
+    400056: Axel2R
+    400058: Axel3R
+    2300000: Axel1L
+    2300002: Axel2L
+    2300004: Axel3L
+    2300006: Body
+    2300008: Plane_004
+    2300010: Plane_005
+    2300012: Plane_006
+    2300014: TreadL
+    2300016: TrreadR
+    2300018: Wheel1L
+    2300020: Wheel1R
+    2300022: Wheel2L
+    2300024: Wheel2R
+    2300026: Wheel3L
+    2300028: Wheel3R
+    2300030: Wheel4L
+    2300032: Wheel4R
+    2300034: Wheel5L
+    2300036: Wheel5R
+    2300038: Wheel6L
+    2300040: Wheel6R
+    2300042: Wheel7L
+    2300044: Wheel7R
+    2300046: Wheel8L
+    2300048: Wheel8R
+    2300050: TreadL_001
+    2300052: Axel1R
+    2300054: Axel2R
+    2300056: Axel3R
+    3300000: Axel1L
+    3300002: Axel2L
+    3300004: Axel3L
+    3300006: Body
+    3300008: Plane_004
+    3300010: Plane_005
+    3300012: Plane_006
+    3300014: TreadL
+    3300016: TrreadR
+    3300018: Wheel1L
+    3300020: Wheel1R
+    3300022: Wheel2L
+    3300024: Wheel2R
+    3300026: Wheel3L
+    3300028: Wheel3R
+    3300030: Wheel4L
+    3300032: Wheel4R
+    3300034: Wheel5L
+    3300036: Wheel5R
+    3300038: Wheel6L
+    3300040: Wheel6R
+    3300042: Wheel7L
+    3300044: Wheel7R
+    3300046: Wheel8L
+    3300048: Wheel8R
+    3300050: TreadL_001
+    3300052: Axel1R
+    3300054: Axel2R
+    3300056: Axel3R
+    4300000: Wheel1R
+    4300002: Wheel8R
+    4300004: TrreadR
+    4300006: Wheel2R
+    4300008: Wheel3R
+    4300010: Wheel4R
+    4300012: Wheel5R
+    4300014: Wheel6R
+    4300016: Wheel7R
+    4300018: Plane_006
+    4300020: Plane_005
+    4300022: Plane_004
+    4300024: Axel3L
+    4300026: Axel2L
+    4300028: Axel1L
+    4300030: Wheel7L
+    4300032: Wheel6L
+    4300034: Wheel5L
+    4300036: Wheel4L
+    4300038: Wheel3L
+    4300040: Wheel2L
+    4300042: TreadL
+    4300044: Wheel8L
+    4300046: Body
+    4300048: Wheel1L
+    4300050: TreadL_001
+    4300052: Axel1R
+    4300054: Axel2R
+    4300056: Axel3R
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
