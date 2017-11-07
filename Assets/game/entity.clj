@@ -6,7 +6,7 @@
     hard.seed)
   (:require [arcadia.internal.benchmarking :as bench]))
 
-(def PARTS (atom {}))
+(defonce PARTS (atom {}))
 
 (deftype ^:once PartHook [^clojure.lang.IFn hook ^UnityEngine.GameObject part])
 
@@ -89,14 +89,6 @@
                 (attach mount m (dec budget) parts))))
           (:mount-points m))))))
 
-(defn extract-hooks [m]
-  ;; TODO: Reimplement this with a call to update-vals
-  (let [obj (:object m)]
-    (into {}
-      (map
-        (fn [[k v]] [k [(PartHook. v obj)]])
-        (:hooks m)))))
-
 (defn update-vals-1
   "Original implementation"
   [m f]
@@ -109,6 +101,10 @@
   (persistent! (reduce-kv (fn [m k v] (assoc! m k (f v))) (transient {}) m)))
 
 (def update-vals update-vals-2)
+
+(defn extract-hooks [m]
+  (let [obj (:object m)]
+    (update-vals (:hooks m) #(list (PartHook. % obj)))))
 
 (defn entity-update [^UnityEngine.GameObject o _]
   (let [input (state o :input)]
