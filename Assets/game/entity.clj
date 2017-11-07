@@ -13,6 +13,7 @@
 (defn part [{:keys [prefab type mount-points hooks state id] :as part-map}]
   (let [id (or id (hash (dissoc part-map :hooks)))
         part-map (assoc part-map :id id)]
+    ;; TODO: update-in ,,, [x] is the same as update ,,, x
     (swap! PARTS update-in [type] assoc id part-map)))
 
 (defn parts-typed [k]
@@ -89,13 +90,16 @@
           (:mount-points m))))))
 
 (defn extract-hooks [m]
+  ;; TODO: Reimplement this with a call to update-vals
   (let [obj (:object m)]
     (into {}
       (map
         (fn [[k v]] [k [(PartHook. v obj)]])
         (:hooks m)))))
 
-(defn update-vals-1 [m f]
+(defn update-vals-1
+  "Original implementation"
+  [m f]
   (into {} (map (fn [[k v]] [k (f v)]) m)))
 
 (defn update-vals-2
@@ -134,6 +138,8 @@
       (state+ root ::parts @parts)
       (state+ root ::hooks
         (update-vals
+          ;; TODO: Speed up this reduction by avoiding a nested merge/concat if possible,
+          ;; or at least use a faster data structure? This needs more detailed analysis.
           (reduce
             (fn [xs m] (merge-with concat xs (extract-hooks m)))
             {} @parts) #(into-array PartHook %)))
