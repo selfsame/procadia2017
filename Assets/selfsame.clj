@@ -87,7 +87,7 @@
     (set! (.isKinematic (->rigidbody o)) false)
     (set! (.connectedBody hj) rb)))
 
-(defn kino-match [o _]
+(defn kino-match [^UnityEngine.GameObject o _]
   (set! (.position (.transform o)) (.position (.transform (parent o))))
   (set! (.rotation (.transform o)) (.rotation (.transform (parent o))))
   )
