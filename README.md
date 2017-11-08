@@ -11,6 +11,8 @@
 * Joseph Parker - GitHub selfsame
 * Douglas P. Fields, Jr. - GitHub LispEngineer
 * Joshua Suskalo - GitHub IGJoshua
+* Ramsey Nasser - Github nasser
+* Tims Gardner - Github timsgardener
 
 
 # parts
@@ -34,7 +36,7 @@ Our entites are collections of parts, which are defined like:
 * `:type` user taxonomy, `:mount-points` declare which types they allow
 * `:id` optional, helps with redefining parts without registering duplicates
 * `:prefab` corresponds to a prefab on a path within `Assets/Resources`
-* `:mount-points` keys should match names of gameobjects in the part, vals are a probability map of which type is chosen. Note you can have a chance of no part (`{nil:10}`)
+* `:mount-points` keys should match names of gameobjects in the part, vals are a probability map of which type is chosen. Note you can have a chance of no part (`{nil 10}`)
 * `:hooks` are a map of functions that will be routed from the root entity.  The first arg is the root object, second is the part object.  You may want to use a var if you plan on re-evaluating the function at runtime.
 * `:state` will be placed into the part state by the `:procjam/part` key
 
