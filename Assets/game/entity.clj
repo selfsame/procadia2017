@@ -6,15 +6,19 @@
     hard.seed)
   (:require [arcadia.internal.benchmarking :as bench]))
 
-(defonce PARTS (atom {}))
+(defonce
+  ^{:doc "We use a volatile because they're faster than atoms and we don't need the
+   thread-safety of an atom (or so I think). It's semantically the same as an
+   atom for @, but uses vswap! and vreset! in place of swap! and reset!"}
+  PARTS
+  (volatile! {}))
 
 (deftype ^:once PartHook [^clojure.lang.IFn hook ^UnityEngine.GameObject part])
 
 (defn part [{:keys [prefab type mount-points hooks state id] :as part-map}]
   (let [id (or id (hash (dissoc part-map :hooks)))
         part-map (assoc part-map :id id)]
-    ;; TODO: update-in ,,, [x] is the same as update ,,, x
-    (swap! PARTS update-in [type] assoc id part-map)))
+    (vswap! PARTS update ,,, type assoc ,,, id part-map)))
 
 (defn parts-typed [k]
   (-> @PARTS k vals))
@@ -23,8 +27,8 @@
   "Original implementation"
   [col]
   (let [total (reduce + (vals col))
-        roll (srand total)]
-    (loop [xs col
+        roll  (srand total)]
+    (loop [xs  col
            acc 0]
       (if (< roll (+ acc (last (first xs))))
           (ffirst xs)
@@ -55,38 +59,59 @@
       0 col)))
 
 (defn probability-4
-  "DPF reimplementation #3 - destructured. This is the fastest by about 10% over -1"
+  "DPF reimplementation #3 - destructured. This is the fastest by about 10% over -1.
+   Adding type hints and using unchecked-add seems to add minimal performance."
   [col]
-  (let [total (reduce + (vals col))
-        roll (srand total)]
-    (loop [[[part chance] & xs] (seq col)
-           acc 0]
-      (let [new-acc (+ acc chance)]
+  (let [      total (reduce + (vals col))
+        ^long roll  (srand total)]
+    (loop [[[part chance] & xs] (seq col) ; convert map to [k v] seq
+           ^long acc 0]
+      (let [^long new-acc (unchecked-add acc chance)]
         (if (< roll new-acc)
           part
           (recur xs new-acc))))))
 
 (def probability probability-4)
 
-(defn child-with-name
+(defn child-with-name-1
   "shallow child-named"
   [obj n]
+  ;; TODO: DPF: (first (filter ...)) should probably be use "some" instead,
+  ;; but reduce with reduced may be the fastest.
   (->> obj children (filter #(= (.name %) n)) first))
 
-(defn attach [mount m budget parts]
+(defn child-with-name-2
+  "Shallow child-named. DPF Reimplementation #1 using reduce/reduced. About 30% faster than -1.
+   reduce is rediculously fast."
+  [obj name]
+  ;; I find threading macros to be a challenge to readability
+  (let [chlds (children obj)]
+    (reduce (fn [_ c] (when (= (.name c) name) (reduced c))) nil chlds)))
+
+(defn child-with-name-3
+  "Shallow child-named. DPF Reimplementation #2 using some. About 0-10% slower than -2, which
+   was as expected, but sometimes 0-10% faster than -2 depending on inputs, which wasn't."
+  [obj name]
+  (let [chlds (children obj)]
+    (some #(when (= name (.name %)) %) chlds)))
+
+(def child-with-name child-with-name-3)
+
+(defn attach
+  "parts is an atom containing a vector of maps, created in make-entity"
+  [mount m budget parts]
   (when (pos? budget)
     (when-let [obj (clone! (:prefab m))]
       (swap! parts conj (assoc m :object obj))
       (parent! obj mount)
       (position! obj (>v3 mount))
       (rotation! obj (.rotation (.transform mount)))
-      (dorun
-        (map
-          (fn [[k v]]
-            (when-let [mount (child-named obj (name k))]
-              (when-let [m (srand-nth (vec (parts-typed (probability v))))]
-                (attach mount m (dec budget) parts))))
-          (:mount-points m))))))
+      (run!
+        (fn [[k v]]
+          (when-let [mount (child-named obj (name k))]
+            (when-let [m (srand-nth (vec (parts-typed (probability v))))]
+              (attach mount m (dec budget) parts))))
+        (:mount-points m)))))
 
 (defn update-vals-1
   "Original implementation"
@@ -106,33 +131,36 @@
     (update-vals (:hooks m) #(list (PartHook. % obj)))))
 
 (defn entity-update [^UnityEngine.GameObject o _]
-  (let [input (state o :input)]
-    (dorun
-      (map
-        (fn [ph]
-          ((.hook ph) o (.part ph)))
-        (:update (state o ::hooks))))
-    (dorun
-      (map
-        (fn [ph]
-          ((.hook ph) o (.part ph) (:movement input)))
-        (:move (state o ::hooks))))
-    (dorun
-      (map
-        (fn [ph]
-          ((.hook ph) o (.part ph) (:mouse-intersection input)))
-        (:aim (state o ::hooks))))))
+  ;; TODO: Regression test this. DPF refactored without a test harness
+  (let [input    (state o :input)
+        hooks    (state o ::hooks)
+        movement (:movement input)
+        mouse-x  (:mouse-intersection input)]
+    ;; run! is preferred over (dorun (map ...))
+    (run!
+      (fn [ph] ((.hook ph) o (.part ph)))
+      (:update hooks))
+    (run!
+      (fn [ph] ((.hook ph) o (.part ph) movement))
+      (:move hooks))
+    (run!
+      (fn [ph] ((.hook ph) o (.part ph) mouse-x))
+      (:aim hooks))))
 
 (defn skin-color! [o c]
-  (let [mrs (.GetComponentsInChildren o UnityEngine.MeshRenderer)
+  ;; TODO: Regression test this. DPF refactored without a test harness
+  (let [mrs  (.GetComponentsInChildren o UnityEngine.MeshRenderer)
         smrs (.GetComponentsInChildren o UnityEngine.SkinnedMeshRenderer)]
-    (dorun (map 
+    (run!
       #(set! (.color %) c)
-      (filter 
-     #(= (.name %) "SKIN (Instance)")
-      (mapcat #(.materials %) (concat mrs smrs)))))))
+      ;; TODO: I feel the below can be heavily optimized. Several concats,
+      ;; a map and a filter...
+      (filter
+        #(= (.name %) "SKIN (Instance)")
+        (mapcat #(.materials %) (concat mrs smrs))))))
 
 (defn make-entity
+  ;; TODO: Regression test this. DPF refactored without a test harness
   ([budget] (make-entity :feet budget))
   ([start-type budget]
     (let [root (clone! :entity)
@@ -147,6 +175,9 @@
           (reduce
             (fn [xs m] (merge-with concat xs (extract-hooks m)))
             {} @parts) #(into-array PartHook %)))
+      ;; JP says that this hook+ function is running extremely slowly.
+      ;; In production we can probably safely use entity-update as it won't
+      ;; be redefined, instead of giving the var (#'entity-update = (var entity-update)) explicitly
       (hook+ root :update ::update #'entity-update)
       (skin-color! root (color (?f 1)(?f 1)(?f 1)))
       (rotate! root (v3 0 (?f 360) 0))
@@ -198,3 +229,22 @@
         b1 (safe-n-timing n (update-vals-1 input func))
         b2 (safe-n-timing n (update-vals-2 input func))]
     [b1 b2]))
+
+(defn bench3
+  "Benchmark child-with-name - using the RecursiveTest scene."
+  []
+  (let [n 250000
+        root (object-named "Root")
+        child-to-find1 "Child2" ; Child1 through Child5 available
+        child-to-find2 "Child5" ; Child1 through Child5 available
+        b1 (safe-n-timing n
+             (do (child-with-name-1 root child-to-find1)
+                 (child-with-name-1 root child-to-find2)))
+        b2 (safe-n-timing n
+             (do (child-with-name-2 root child-to-find1)
+                 (child-with-name-2 root child-to-find2)))
+        b3 (safe-n-timing n
+             (do (child-with-name-3 root child-to-find1)
+                 (child-with-name-3 root child-to-find2)))
+       ]
+    [b1 b2 b3]))
