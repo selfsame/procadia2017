@@ -123,6 +123,15 @@
           ((.hook ph) o (.part ph) (:mouse-intersection input)))
         (:aim (state o ::hooks))))))
 
+(defn skin-color! [o c]
+  (let [mrs (.GetComponentsInChildren o UnityEngine.MeshRenderer)
+        smrs (.GetComponentsInChildren o UnityEngine.SkinnedMeshRenderer)]
+    (dorun (map 
+      #(set! (.color %) c)
+      (filter 
+     #(= (.name %) "SKIN (Instance)")
+      (mapcat #(.materials %) (concat mrs smrs)))))))
+
 (defn make-entity
   ([budget] (make-entity :feet budget))
   ([start-type budget]
@@ -139,6 +148,8 @@
             (fn [xs m] (merge-with concat xs (extract-hooks m)))
             {} @parts) #(into-array PartHook %)))
       (hook+ root :update ::update #'entity-update)
+      (skin-color! root (color (?f 1)(?f 1)(?f 1)))
+      (rotate! root (v3 0 (?f 360) 0))
       root)))
 
 

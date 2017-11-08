@@ -32,9 +32,34 @@
 (defn body-update [o this]
   (let [{:keys [movement aim mouse-intersection]} (state o :input)]
     (when aim 
+      ;TODO recticule is a global thing
       (position! @AIM mouse-intersection)
       (lerp-look! this (v3+ (>v3 this) 
                          (v3 (.x aim) 0 (.y aim))) 0.4))))
+
+(defn arm-update [o this aim]
+  (let [{:keys [movement aim mouse-intersection]} (state o :input)]
+    (when aim 
+      (look-at! this (v3+ mouse-intersection (v3 0 1 0)) (v3 0 0 1))
+      (rotate! this (v3 90 0 0)))))
+
+(defn bullet-update [o _]
+  (position! o (v3+ (>v3 o) (v3 0 0 (∆ 20)))))
+
+(defn gun-update [o this]
+  (let [{:keys [movement aim mouse-intersection buttons-pressed]} (state o :input)]
+    (update-data! this :cooldown #(if % (inc %) 0))
+    (when (and (:fire buttons-pressed)
+               (> (data this :cooldown) 10))   
+        (data! this :cooldown 0)
+        (let [bullet (clone! :bullets/pellet (>v3 this))]
+          ;(hook+ bullet :update #'bullet-update)
+          (set! (.rotation (.transform bullet)) (.rotation (.transform this)))
+          (timeline*
+            (fn [] 
+              (position! bullet (v3+ (>v3 bullet) 
+                                     (local-direction bullet (v3 0 (∆ 40) 0))))))
+          (destroy bullet 3.0)))))
 
 (part {
   :type :feet
@@ -83,7 +108,7 @@
   :prefab :parts/business-arm
   :mount-points {
     :item {:item 1}}
-  :hooks {:aim (fn [root this aim])}})
+  :hooks {:aim #'arm-update}})
 
 (part {
   :type :head
@@ -103,7 +128,7 @@
   :type :item
   :id :raygun
   :prefab :parts/raygun
-  :hooks {}})
+  :hooks {:update #'gun-update}})
 
 
 (defn kino-settle [^UnityEngine.GameObject o _]
@@ -155,3 +180,4 @@
 '(hook+ (the blob) :start #'kino-settle)
 
 '(hook+ (the rag-tentacle-k) :update #'kino-match)
+
