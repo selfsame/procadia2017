@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4681751857047432}
   - component: {fileID: 33112105932961432}
   - component: {fileID: 23782139332417036}
+  - component: {fileID: 135964006114286152}
   m_Layer: 0
   m_Name: eyeball
   m_TagString: Untagged
@@ -80,3 +81,15 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1260587892874134}
   m_Mesh: {fileID: 4300000, guid: d0f9e325312f74626851910152b7865d, type: 3}
+--- !u!135 &135964006114286152
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1260587892874134}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.876976
+  m_Center: {x: -1.4109085e-24, y: 0, z: 0.026363498}

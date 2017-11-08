@@ -138,13 +138,13 @@
         mouse-x  (:mouse-intersection input)]
     ;; run! is preferred over (dorun (map ...))
     (run!
-      (fn [ph] ((.hook ph) o (.part ph)))
+      (fn [^PartHook ph] ((.hook ph) o (.part ph)))
       (:update hooks))
     (run!
-      (fn [ph] ((.hook ph) o (.part ph) movement))
+      (fn [^PartHook ph] ((.hook ph) o (.part ph) movement))
       (:move hooks))
     (run!
-      (fn [ph] ((.hook ph) o (.part ph) mouse-x))
+      (fn [^PartHook ph] ((.hook ph) o (.part ph) mouse-x))
       (:aim hooks))))
 
 (defn skin-color! [o c]

@@ -29,8 +29,9 @@
       (when (> (.magnitude movement) 0.001)
         (lerp-look! this (v3+ (>v3 this) movement) 0.2)))))
 
-(defn body-update [o this]
-  (let [{:keys [movement aim mouse-intersection]} (state o :input)]
+(defn body-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
+  (let [{:keys [aim mouse-intersection]} (state o :input)
+        ^UnityEngine.Vector2 aim aim]
     (when aim 
       ;TODO recticule is a global thing
       (position! @AIM mouse-intersection)
@@ -46,8 +47,8 @@
 (defn bullet-update [o _]
   (position! o (v3+ (>v3 o) (v3 0 0 (∆ 20)))))
 
-(defn gun-update [o this]
-  (let [{:keys [movement aim mouse-intersection buttons-pressed]} (state o :input)]
+(m/defn gun-update [o this]
+  #_(let [{:keys [movement aim mouse-intersection buttons-pressed]} (state o :input)]
     (update-data! this :cooldown #(if % (inc %) 0))
     (when (and (:fire buttons-pressed)
                (> (data this :cooldown) 10))   
@@ -59,7 +60,7 @@
             (fn [] 
               (position! bullet (v3+ (>v3 bullet) 
                                      (local-direction bullet (v3 0 (∆ 40) 0))))))
-          (destroy bullet 3.0)))))
+          (destroy bullet 3.0)))) )
 
 (part {
   :type :feet

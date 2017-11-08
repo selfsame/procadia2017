@@ -220,8 +220,8 @@
 (defn look-quat [a b]
   (Quaternion/LookRotation  (->v3 (arcadia.linear/v3- (->v3 b) (->v3 a)))))
 
-(defn lerp-look! [a b ^double v]
-  (let [at (->transform a)
+(defn lerp-look! [^UnityEngine.GameObject a b ^double v]
+  (let [^UnityEngine.Transform at (.transform a)
         aq (.rotation at)
         lq (look-quat a b)
         res (Quaternion/Lerp aq lq (float v))]
