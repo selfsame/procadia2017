@@ -12,6 +12,7 @@
     [magic.api :as m])
   (import 
     Bone
+    Timer
     [UnityEngine Mathf Time GameObject]))
 
 
@@ -43,23 +44,21 @@
     (when aim 
       (look-at! this (v3+ mouse-intersection (v3 0 1 0)) (v3 0 1 0)))))
 
-(defn bullet-update [o _]
-  (position! o (v3+ (>v3 o) (v3 0 0 (∆ 20)))))
 
 (defn gun-update [o this]
-  (let [{:keys [movement aim mouse-intersection buttons-pressed]} (state o :input)]
-    (update-data! this :cooldown #(if % (inc %) 0))
+  (let [buttons-pressed (:buttons-pressed (state o :input))
+        ^Timer timer (cmpt this Timer)] 
+    (set! (.value timer) (int (+ (.value timer) 1)))
     (when (and (:fire buttons-pressed)
-               (> (data this :cooldown) 10))   
-        (data! this :cooldown 0)
+               (> (.value timer) 10))   
+        (set! (.value timer) (int 0))
         (let [bullet (clone! :bullets/pellet (>v3 this))]
-          ;(hook+ bullet :update #'bullet-update)
           (set! (.rotation (.transform bullet)) (.rotation (.transform this)))
           (timeline*
             (fn [] 
-              (position! bullet (v3+ (>v3 bullet) 
-                                     (local-direction bullet (v3 0 0 (∆ 40)))))))
-          (destroy bullet 3.0)))) )
+              (position! bullet 
+                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 40)))))))
+          (destroy bullet 3.0)))))
 
 (part {
   :type :feet
@@ -128,7 +127,9 @@
   :type :item
   :id :raygun
   :prefab :parts/raygun
-  :hooks {:update #'gun-update}})
+  :hooks {
+    :start (fn [root this] (cmpt+ this Timer))
+    :update #'gun-update}})
 
 
 (defn kino-settle [^UnityEngine.GameObject o _]

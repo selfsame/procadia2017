@@ -108,6 +108,13 @@
   (let [obj (:object m)]
     (update-vals (:hooks m) #(list (PartHook. % obj)))))
 
+(defn entity-start [^UnityEngine.GameObject o _]
+  (let [input    (state o :input)
+        hooks    (state o ::hooks)]
+    (run!
+      (fn [^PartHook ph] ((.hook ph) o (.part ph)))
+      (:start hooks))))
+
 (defn entity-update [^UnityEngine.GameObject o _]
   ;; TODO: Regression test this. DPF refactored without a test harness
   (let [input    (state o :input)
@@ -153,6 +160,7 @@
           (reduce
             (fn [xs m] (merge-with concat xs (extract-hooks m)))
             {} @parts) #(into-array PartHook %)))
+      (hook+ root :start ::start entity-start)
       (hook+ root :update ::update entity-update)
       (skin-color! root (color (?f 1)(?f 1)(?f 1)))
       (rotate! root (v3 0 (?f 360) 0))
@@ -205,21 +213,3 @@
         b2 (safe-n-timing n (update-vals-2 input func))]
     [b1 b2]))
 
-(defn bench3
-  "Benchmark child-with-name - using the RecursiveTest scene."
-  []
-  (let [n 250000
-        root (object-named "Root")
-        child-to-find1 "Child2" ; Child1 through Child5 available
-        child-to-find2 "Child5" ; Child1 through Child5 available
-        b1 (safe-n-timing n
-             (do (child-with-name-1 root child-to-find1)
-                 (child-with-name-1 root child-to-find2)))
-        b2 (safe-n-timing n
-             (do (child-with-name-2 root child-to-find1)
-                 (child-with-name-2 root child-to-find2)))
-        b3 (safe-n-timing n
-             (do (child-with-name-3 root child-to-find1)
-                 (child-with-name-3 root child-to-find2)))
-       ]
-    [b1 b2 b3]))
