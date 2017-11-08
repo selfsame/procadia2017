@@ -80,7 +80,6 @@
       (parent! obj mount)
       (position! obj (>v3 mount))
       (rotation! obj (.rotation (.transform mount)))
-      (local-scale! obj (local-scale mount))
       (dorun
         (map
           (fn [[k v]]
@@ -147,7 +146,7 @@
 
 '(do
   (clear-cloned!)
-  (def ph (state (make-entity :feet 3))))
+  (def ph (state (make-entity :feet 10))))
 
 
 

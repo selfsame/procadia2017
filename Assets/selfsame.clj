@@ -81,6 +81,8 @@
   :type :arm
   :id :business
   :prefab :parts/business-arm
+  :mount-points {
+    :item {:item 1}}
   :hooks {:aim (fn [root this aim])}})
 
 (part {
@@ -92,7 +94,16 @@
 (part {
   :type :arm
   :id :tentacle
-  :prefab :parts/rag-tentacle-k})
+  :prefab :parts/rag-tentacle-k
+  :mount-points {
+    :item {:item 1
+           :nil 1}}})
+
+(part {
+  :type :item
+  :id :raygun
+  :prefab :parts/raygun
+  :hooks {}})
 
 
 (defn kino-settle [^UnityEngine.GameObject o _]
