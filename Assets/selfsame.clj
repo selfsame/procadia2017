@@ -41,14 +41,13 @@
 (defn arm-update [o this aim]
   (let [{:keys [movement aim mouse-intersection]} (state o :input)]
     (when aim 
-      (look-at! this (v3+ mouse-intersection (v3 0 1 0)) (v3 0 0 1))
-      (rotate! this (v3 90 0 0)))))
+      (look-at! this (v3+ mouse-intersection (v3 0 1 0)) (v3 0 1 0)))))
 
 (defn bullet-update [o _]
   (position! o (v3+ (>v3 o) (v3 0 0 (∆ 20)))))
 
-(m/defn gun-update [o this]
-  #_(let [{:keys [movement aim mouse-intersection buttons-pressed]} (state o :input)]
+(defn gun-update [o this]
+  (let [{:keys [movement aim mouse-intersection buttons-pressed]} (state o :input)]
     (update-data! this :cooldown #(if % (inc %) 0))
     (when (and (:fire buttons-pressed)
                (> (data this :cooldown) 10))   
@@ -59,7 +58,7 @@
           (timeline*
             (fn [] 
               (position! bullet (v3+ (>v3 bullet) 
-                                     (local-direction bullet (v3 0 (∆ 40) 0))))))
+                                     (local-direction bullet (v3 0 0 (∆ 40)))))))
           (destroy bullet 3.0)))) )
 
 (part {
