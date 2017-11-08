@@ -17,8 +17,9 @@
 
 (defn part [{:keys [prefab type mount-points hooks state id] :as part-map}]
   (let [id (or id (hash (dissoc part-map :hooks)))
-        part-map (assoc part-map :id id)]
-    (vswap! PARTS update ,,, type assoc ,,, id part-map)))
+        part-map (assoc part-map :id id)
+        types (if (seqable? type) type (list type))]
+    (run! #(vswap! PARTS update ,,, % assoc ,,, id part-map) types)))
 
 (defn parts-typed [k]
   (-> @PARTS k vals))
@@ -73,36 +74,13 @@
 
 (def probability probability-4)
 
-(defn child-with-name-1
-  "shallow child-named"
-  [obj n]
-  ;; TODO: DPF: (first (filter ...)) should probably be use "some" instead,
-  ;; but reduce with reduced may be the fastest.
-  (->> obj children (filter #(= (.name %) n)) first))
-
-(defn child-with-name-2
-  "Shallow child-named. DPF Reimplementation #1 using reduce/reduced. About 30% faster than -1.
-   reduce is rediculously fast."
-  [obj name]
-  ;; I find threading macros to be a challenge to readability
-  (let [chlds (children obj)]
-    (reduce (fn [_ c] (when (= (.name c) name) (reduced c))) nil chlds)))
-
-(defn child-with-name-3
-  "Shallow child-named. DPF Reimplementation #2 using some. About 0-10% slower than -2, which
-   was as expected, but sometimes 0-10% faster than -2 depending on inputs, which wasn't."
-  [obj name]
-  (let [chlds (children obj)]
-    (some #(when (= name (.name %)) %) chlds)))
-
-(def child-with-name child-with-name-3)
-
 (defn attach
   "parts is an atom containing a vector of maps, created in make-entity"
   [mount m budget parts]
   (when (pos? budget)
     (when-let [obj (clone! (:prefab m))]
       (swap! parts conj (assoc m :object obj))
+      (state+ obj :procjam/part (or (:state m) {}))
       (parent! obj mount)
       (position! obj (>v3 mount))
       (rotation! obj (.rotation (.transform mount)))
@@ -175,10 +153,7 @@
           (reduce
             (fn [xs m] (merge-with concat xs (extract-hooks m)))
             {} @parts) #(into-array PartHook %)))
-      ;; JP says that this hook+ function is running extremely slowly.
-      ;; In production we can probably safely use entity-update as it won't
-      ;; be redefined, instead of giving the var (#'entity-update = (var entity-update)) explicitly
-      (hook+ root :update ::update #'entity-update)
+      (hook+ root :update ::update entity-update)
       (skin-color! root (color (?f 1)(?f 1)(?f 1)))
       (rotate! root (v3 0 (?f 360) 0))
       root)))

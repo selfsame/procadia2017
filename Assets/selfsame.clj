@@ -85,12 +85,12 @@
   :id :blob
   :prefab :parts/blob
   :mount-points {
-    :arm1 {:arm 1}
-    :arm2 {:arm 1}
-    :arm3 {:arm 1}
-    :arm4 {:arm 1}
-    :arm5 {:arm 1}
-    :arm6 {:arm 1}} 
+    :arm1 {:tentacle 1}
+    :arm2 {:tentacle 1}
+    :arm3 {:tentacle 1}
+    :arm4 {:tentacle 1}
+    :arm5 {:tentacle 1}
+    :arm6 {:tentacle 1}} 
   :hooks {:update #'body-update}})
 
 (part {
@@ -117,7 +117,7 @@
 
 
 (part {
-  :type :arm
+  :type [:arm :tentacle]
   :id :tentacle
   :prefab :parts/rag-tentacle-k
   :mount-points {

@@ -33,7 +33,7 @@ Our entites are collections of parts, which are defined like:
   :hooks {:update (fn [root entity])}
   :state {:foo 1}})
  ```
-* `:type` user taxonomy, `:mount-points` declare which types they allow
+* `:type` user taxonomy, `:mount-points` declare which types they allow. value can be a keyword or collection of keywords for multiple type registration
 * `:id` optional, helps with redefining parts without registering duplicates
 * `:prefab` corresponds to a prefab on a path within `Assets/Resources`
 * `:mount-points` keys should match names of gameobjects in the part, vals are a probability map of which type is chosen. Note you can have a chance of no part (`{nil 10}`)
