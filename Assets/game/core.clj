@@ -10,6 +10,7 @@
     input.core
     game.world
     game.entity
+    game.ai
     selfsame))
 
 (defn update-camera [o _]
@@ -29,6 +30,8 @@
             (fn [sp] 
               (let [monster (game.entity/make-entity (* depth 10))]
                 (position! monster (.position (.transform sp)))
+                (hook+ monster :start :ai #'game.ai/ai-start)
+                (hook+ monster :update :ai #'game.ai/ai-update)
                 monster))
             (take 20 (rest spawn-points))))
         camera (clone! :iso-camera)]

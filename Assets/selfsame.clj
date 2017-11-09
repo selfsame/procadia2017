@@ -10,7 +10,8 @@
     tween.core)
   (require
     [magic.api :as m]
-    game.fx)
+    game.fx
+    game.play)
   (import 
     Bone
     Timer
@@ -40,37 +41,6 @@
       (lerp-look! this (v3+ (>v3 this) 
                          (v3 (.x aim) 0 (.y aim))) 0.4))))
 
-(defn arm-update [o this aim]
-  (let [{:keys [movement aim mouse-intersection]} (state o :input)]
-    (when aim 
-      (look-at! this (v3+ mouse-intersection (v3 0 (.y (>v3 this)) 0)) (v3 0 1 0)))))
-
-(defn kill [o]
-  (let [seed (:game.entity/seed (state o))
-        start-type (:game.entity/start-type (state o))
-        ppos (>v3 @PLAYER)
-        prot (rotation @PLAYER)
-        new-player (make-entity start-type 20 seed)]
-    (run! 
-      (fn [o] 
-        (game.fx/smoke (>v3 o))
-        (timeline*
-          (tween {:local {:scale (v3 0)}} o 0.5)
-          (destroy o))) 
-      [o @PLAYER])
-    (position! new-player ppos)
-    (rotation! new-player prot)
-    (reset! PLAYER new-player)
-    (state+ @INPUT :output-obj @PLAYER)))
-
-(defn damage [o n]
-  (let [root (.gameObject (.root (.transform o)))]
-    (when (:entity? (state root))
-      (update-state root :hp #(- % n))
-      (if (< (state root :hp) 0)
-          (kill root)))))
-
-
 (defn gun-update [o this]
   (let [buttons-pressed (:buttons-pressed (state o :input))
         ^Timer timer (cmpt this Timer)] 
@@ -83,7 +53,7 @@
           (timeline*
             (fn [] 
               (when-let [hit (hit (>v3 bullet) (.forward (.transform bullet)) (∆ 40))]
-                (damage (.gameObject (.collider hit)) 2)
+                (game.play/damage (.gameObject (.collider hit)) 2)
                 (destroy bullet 0.01))
               (position! bullet 
                 (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 40)))))))
@@ -127,8 +97,7 @@
   :prefab :parts/business-head
   :hooks {
     :update 
-    (fn [root this] )
-    }})
+    (fn [root this])}})
 
 (part {
   :type :arm
@@ -136,13 +105,12 @@
   :prefab :parts/business-arm
   :mount-points {
     :item {:item 1}}
-  :hooks {:aim #'arm-update}})
+  :hooks {:aim #'game.play/arm-update}})
 
 (part {
   :type :head
   :id :eyeball
   :prefab :parts/eyeball})
-
 
 (part {
   :type [:arm :tentacle]
@@ -161,27 +129,8 @@
     :update #'gun-update}})
 
 
-(defn kino-settle [^UnityEngine.GameObject o _]
-  (let [root (.. o transform root gameObject)
-        rb (cmpt root UnityEngine.Rigidbody)]
-    (set! (.isKinematic rb) true)
-    (timeline*
-      (wait 0.2)
-      #(do (set! (.isKinematic rb) false) nil))))
 
 
-(defn attach-rb [o _]
-  (let [root (.. o transform root gameObject)
-        rb (cmpt root UnityEngine.Rigidbody)
-        hj (cmpt+ o UnityEngine.HingeJoint)]
-    (log root rb)
-    (set! (.isKinematic (->rigidbody o)) false)
-    (set! (.connectedBody hj) rb)))
-
-(m/defn kino-match [^UnityEngine.GameObject o _]
-  ;(set! (.position (.transform o)) (.position (.transform (.parent (.transform o)))))
-  ;(set! (.rotation (.transform o)) (.rotation (.transform (.parent (.transform o)))))
-  )
 
 '(do
   (clear-cloned!)
@@ -198,16 +147,10 @@
           (set! (.connectedBody hj) (cmpt prev UnityEngine.Rigidbody))
           (set! (.useLimits hj) true)
           (set! (.min (.limits hj)) -10)
-          (set! (.max (.limits hj)) 10)
-          )
-        bone
-        )
-      o
-      bones)
-
-    ))
+          (set! (.max (.limits hj)) 10))
+        bone)
+      o bones)))
 
 '(hook+ (the blob) :start #'kino-settle)
-
 '(hook+ (the rag-tentacle-k) :update #'kino-match)
 

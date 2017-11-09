@@ -4,7 +4,8 @@
     arcadia.linear
     hard.core
     hard.seed)
-  (:require [arcadia.internal.benchmarking :as bench]))
+  (require
+    [arcadia.internal.benchmarking :as bench]))
 
 (defonce
   ^{:doc "We use a volatile because they're faster than atoms and we don't need the
@@ -167,8 +168,8 @@
           (reduce
             (fn [xs m] (merge-with concat xs (extract-hooks m)))
             {} @parts) #(into-array PartHook %)))
-      (hook+ root :start ::start entity-start)
-      (hook+ root :update ::update entity-update)
+      (hook+ root :start ::start #'entity-start)
+      (hook+ root :update ::update #'entity-update)
       (skin-color! root (color (?f 1)(?f 1)(?f 1)))
       (rotate! root (v3 0 (?f 360) 0))
       root)))

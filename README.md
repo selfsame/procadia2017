@@ -45,3 +45,15 @@ Parts will match the rotation of their mount point transform.  Our convention is
 
 Part meshes that use the `SKIN` material will have a color assigned.  If your blend is saved in `Assets/blends`, you can just name a material "SKIN".
 
+# project structure
+
+* `game.core` sets up the game loop
+* `game.world` constructs game maps
+* `game.entity` assembles parts into entities
+* `game.data` ns with no deps for global stuff
+* `game.play` game system functions (damage/kill), generic part hooks
+* `game.ai` behaviour hooks for the non player entities
+* `game.fx` special effect fns
+
+`part` definitions can go in user namespaces like `selfsame.clj`
+

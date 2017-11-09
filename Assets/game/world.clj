@@ -7,16 +7,6 @@
     [OverlapWFC]
     [UnityEngine GameObject]))
 
-
-
-
-(defn arm [entity]
-  {:object (GameObject. "arm")
-   :mounts [{:point (v3 1 0 0) :type :weapon}]
-   :update (fn [this input])
-   :hp 10})
-
-
 (defn spawn-points []
   (remove null-obj? (shuffle (objects-tagged "spawn"))))
 
