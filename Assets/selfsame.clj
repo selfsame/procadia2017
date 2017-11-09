@@ -9,7 +9,8 @@
     game.data
     tween.core)
   (require
-    [magic.api :as m])
+    [magic.api :as m]
+    game.fx)
   (import 
     Bone
     Timer
@@ -42,7 +43,32 @@
 (defn arm-update [o this aim]
   (let [{:keys [movement aim mouse-intersection]} (state o :input)]
     (when aim 
-      (look-at! this (v3+ mouse-intersection (v3 0 1 0)) (v3 0 1 0)))))
+      (look-at! this (v3+ mouse-intersection (v3 0 (.y (>v3 this)) 0)) (v3 0 1 0)))))
+
+(defn kill [o]
+  (let [seed (:game.entity/seed (state o))
+        start-type (:game.entity/start-type (state o))
+        ppos (>v3 @PLAYER)
+        prot (rotation @PLAYER)
+        new-player (make-entity start-type 20 seed)]
+    (run! 
+      (fn [o] 
+        (game.fx/smoke (>v3 o))
+        (timeline*
+          (tween {:local {:scale (v3 0)}} o 0.5)
+          (destroy o))) 
+      [o @PLAYER])
+    (position! new-player ppos)
+    (rotation! new-player prot)
+    (reset! PLAYER new-player)
+    (state+ @INPUT :output-obj @PLAYER)))
+
+(defn damage [o n]
+  (let [root (.gameObject (.root (.transform o)))]
+    (when (:entity? (state root))
+      (update-state root :hp #(- % n))
+      (if (< (state root :hp) 0)
+          (kill root)))))
 
 
 (defn gun-update [o this]
@@ -56,6 +82,9 @@
           (set! (.rotation (.transform bullet)) (.rotation (.transform this)))
           (timeline*
             (fn [] 
+              (when-let [hit (hit (>v3 bullet) (.forward (.transform bullet)) (∆ 40))]
+                (damage (.gameObject (.collider hit)) 2)
+                (destroy bullet 0.01))
               (position! bullet 
                 (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 40)))))))
           (destroy bullet 3.0)))))

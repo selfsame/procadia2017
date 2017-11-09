@@ -4,7 +4,8 @@
     arcadia.linear
     hard.core
     hard.physics
-    game.data)
+    game.data
+    tween.core)
   (require
     input.core
     game.world
@@ -32,6 +33,7 @@
             (take 20 (rest spawn-points))))
         camera (clone! :iso-camera)]
     (reset! PLAYER player)
+    (reset! INPUT player-input)
     (reset! CAMERA camera)
     (reset! CAMERA-AXIS (first (children camera)))
     (reset! AIM (clone! :cube))
@@ -49,4 +51,3 @@
 
 '(hook+ (the start) :start :start #'start)
 '(hook+ (the player-input) :update #'input.core/push-input!)
-

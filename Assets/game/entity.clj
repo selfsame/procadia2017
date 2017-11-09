@@ -109,6 +109,9 @@
     (update-vals (:hooks m) #(list (PartHook. % obj)))))
 
 (defn entity-start [^UnityEngine.GameObject o _]
+  (state+ o :entity? true)
+  (state+ o :hp 10)
+  (state+ o :max-hp 10)
   (let [input    (state o :input)
         hooks    (state o ::hooks)]
     (run!
@@ -147,11 +150,15 @@
 (defn make-entity
   ;; TODO: Regression test this. DPF refactored without a test harness
   ([budget] (make-entity :feet budget))
-  ([start-type budget]
+  ([start-type budget] (make-entity start-type budget (srand-int 1000000)))
+  ([start-type budget seed]
+    (seed! seed)
     (let [root (clone! :entity)
           parts (atom [])]
       (when-let [start (srand-nth (vec (parts-typed start-type)))]
         (attach root start budget parts))
+      (state+ root ::seed seed)
+      (state+ root ::start-type start-type)
       (state+ root ::parts @parts)
       (state+ root ::hooks
         (update-vals
@@ -171,7 +178,7 @@
 
 '(do
   (clear-cloned!)
-  (def ph (state (make-entity :feet 10))))
+  (make-entity :feet 20 12))
 
 
 

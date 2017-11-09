@@ -16,6 +16,7 @@ ModelImporter:
     100016: boots-arm
     100018: body-bone
     100020: blob
+    100022: smoke
     400000: //RootNode
     400002: Cube
     400004: eyeball
@@ -27,6 +28,7 @@ ModelImporter:
     400016: boots-arm
     400018: body-bone
     400020: blob
+    400022: smoke
     2300000: //RootNode
     2300002: Cube
     2300004: eyeball
@@ -39,10 +41,12 @@ ModelImporter:
     4300002: Cube
     4300004: boots
     4300006: blob
+    4300008: smoke
     7400000: Default Take
     7400002: walk
     9500000: //RootNode
     13700000: boots
+    13700002: smoke
   materials:
     importMaterials: 1
     materialName: 0
