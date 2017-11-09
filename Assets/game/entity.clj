@@ -7,12 +7,7 @@
   (require
     [arcadia.internal.benchmarking :as bench]))
 
-(defonce
-  ^{:doc "We use a volatile because they're faster than atoms and we don't need the
-   thread-safety of an atom (or so I think). It's semantically the same as an
-   atom for @, but uses vswap! and vreset! in place of swap! and reset!"}
-  PARTS
-  (volatile! {}))
+(defonce PARTS (volatile! {}))
 
 (deftype ^:once PartHook [^clojure.lang.IFn hook ^UnityEngine.GameObject part])
 
@@ -25,45 +20,7 @@
 (defn parts-typed [k]
   (-> @PARTS k vals))
 
-(defn probability-1
-  "Original implementation"
-  [col]
-  (let [total (reduce + (vals col))
-        roll  (srand total)]
-    (loop [xs  col
-           acc 0]
-      (if (< roll (+ acc (last (first xs))))
-          (ffirst xs)
-          (recur (rest xs) (+ acc (last (first xs))))))))
-
-(defn probability-2
-  "DPF reimplementation #1 - apply +. Slower (!)."
-  [col]
-  (let [total (apply + (vals col))
-        roll (srand total)]
-    (loop [xs col
-           acc 0]
-      (if (< roll (+ acc (last (first xs))))
-          (ffirst xs)
-          (recur (rest xs) (+ acc (last (first xs))))))))
-
-(defn probability-3
-  "DPF reimplementation #2 - Reducing function for inner loop."
-  [col]
-  (let [total (reduce + (vals col))
-        roll (srand total)]
-    (reduce
-      (fn [acc [part chance]]
-        (let [new-acc (+ acc chance)]
-          (if (< roll new-acc)
-            (reduced part)
-            new-acc)))
-      0 col)))
-
-(defn probability-4
-  "DPF reimplementation #3 - destructured. This is the fastest by about 10% over -1.
-   Adding type hints and using unchecked-add seems to add minimal performance."
-  [col]
+(defn probability [col]
   (let [      total (reduce + (vals col))
         ^long roll  (srand total)]
     (loop [[[part chance] & xs] (seq col) ; convert map to [k v] seq
@@ -72,8 +29,6 @@
         (if (< roll new-acc)
           part
           (recur xs new-acc))))))
-
-(def probability probability-4)
 
 (defn attach
   "parts is an atom containing a vector of maps, created in make-entity"
@@ -92,18 +47,8 @@
               (attach mount m (dec budget) parts))))
         (:mount-points m)))))
 
-(defn update-vals-1
-  "Original implementation"
-  [m f]
-  (into {} (map (fn [[k v]] [k (f v)]) m)))
-
-(defn update-vals-2
-  "DPF Reimplementation #1 of update-vals-1 using reduce-kv and transients
-   (vastly faster, like 7x)"
-  [m f]
+(defn update-vals [m f]
   (persistent! (reduce-kv (fn [m k v] (assoc! m k (f v))) (transient {}) m)))
-
-(def update-vals update-vals-2)
 
 (defn extract-hooks [m]
   (let [obj (:object m)]
@@ -120,7 +65,6 @@
       (:start hooks))))
 
 (defn entity-update [^UnityEngine.GameObject o _]
-  ;; TODO: Regression test this. DPF refactored without a test harness
   (let [input    (state o :input)
         hooks    (state o ::hooks)
         movement (:movement input)
@@ -137,7 +81,6 @@
       (:aim hooks))))
 
 (defn skin-color! [o c]
-  ;; TODO: Regression test this. DPF refactored without a test harness
   (let [mrs  (.GetComponentsInChildren o UnityEngine.MeshRenderer)
         smrs (.GetComponentsInChildren o UnityEngine.SkinnedMeshRenderer)]
     (run!
@@ -149,7 +92,6 @@
         (mapcat #(.materials %) (concat mrs smrs))))))
 
 (defn make-entity
-  ;; TODO: Regression test this. DPF refactored without a test harness
   ([budget] (make-entity :feet budget))
   ([start-type budget] (make-entity start-type budget (srand-int 1000000)))
   ([start-type budget seed]
@@ -175,49 +117,7 @@
       root)))
 
 
-
-
 '(do
   (clear-cloned!)
   (make-entity :feet 20 12))
-
-
-
-
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Benchmarking code - DPF
-
-(defmacro safe-n-timing
-  "This is required because using too high an N will cause a spurious
-   System.NullReferenceException. Hypothesis: Mono cannot keep up with
-   the garbage created by ClojureCLR."
-  [n func]
-  `(try
-    (bench/n-timing ~n ~func)
-    (catch System.Exception e# -1.0)))
-
-(defn bench1
-  "Benchmark probability-# functions"
-  []
-  (let [n 500000
-        input {:arm 10 :leg 5 :belt 2 :head 1}
-        b1 (safe-n-timing n (probability-1 input))
-        b2 (safe-n-timing n (probability-2 input))
-        b3 (safe-n-timing n (probability-3 input))
-        b4 (safe-n-timing n (probability-4 input))]
-    [b1 b2 b3 b4]))
-
-(defn bench2
-  "Benchmark update-vals functions"
-  []
-  (let [n 250000
-        input {:a 1 :b 2 :c 3 :d 4}
-        func inc
-        b1 (safe-n-timing n (update-vals-1 input func))
-        b2 (safe-n-timing n (update-vals-2 input func))]
-    [b1 b2]))
 

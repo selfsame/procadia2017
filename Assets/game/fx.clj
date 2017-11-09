@@ -19,7 +19,8 @@
 
 (defn smoke [pos]
   (dotimes [i 15]
-    (let [o (clone! :fx/smoke (v3+ pos (v3 (?f -2 2)(?f 0 2)(?f -2 2))))]
+    (let [o (clone! :fx/smoke)]
+      (position! o (v3+ pos (v3 (?f -2 2)(?f 0 2)(?f -2 2))))
       (local-scale! o (v3 0))
       (timeline*
         (tween {:local {:scale (v3 1)}} o (?f 0.1 0.3))

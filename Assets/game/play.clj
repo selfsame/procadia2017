@@ -8,7 +8,8 @@
     game.data)
   (require
     game.entity
-    game.fx))
+    game.fx)
+  (import [UnityEngine]))
 
 (defn kino-settle [^UnityEngine.GameObject o _]
   (let [root (.. o transform root gameObject)

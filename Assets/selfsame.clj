@@ -48,7 +48,8 @@
     (when (and (:fire buttons-pressed)
                (> (.value timer) 10))   
         (set! (.value timer) (int 0))
-        (let [bullet (clone! :bullets/pellet (>v3 this))]
+        (let [bullet (clone! :bullets/pellet)]
+          (position! bullet (>v3 this))
           (set! (.rotation (.transform bullet)) (.rotation (.transform this)))
           (timeline*
             (fn [] 

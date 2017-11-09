@@ -84,8 +84,19 @@
   (reset! CLONED [])
   (reset! DATA {}))
 
-(defn ^UnityEngine.GameObject clone!
-  ([ref] (clone! ref nil))
+(defmacro clone! [kw]
+  (if (keyword? kw)
+    (let [source (clojure.string/replace (subs (str kw) 1) #"[:]" "/")]
+      `(let [^UnityEngine.GameObject source# (~'UnityEngine.Resources/Load ~source)
+             ^UnityEngine.GameObject gob# (~'UnityEngine.GameObject/Instantiate source#)]
+        (~'set! (.name gob#) (.name source#))
+        (swap! ~'hard.core/CLONED #(cons gob# %))
+        gob#))
+    `(-clone! ~kw)))
+
+
+(defn ^UnityEngine.GameObject -clone!
+  ([ref] (-clone! ref nil))
   ([ref pos]
     (when (playing?)
       (when-let [^UnityEngine.GameObject source 

@@ -1,9 +1,15 @@
 (ns hard.physics
   (:use arcadia.linear)
   (:import
-    [UnityEngine Mathf Vector3 Ray Physics RaycastHit Physics2D]))
+    [UnityEngine Mathf Vector3 Ray Physics RaycastHit Physics2D LayerMask]))
 
 (defn gob? [x] (instance? UnityEngine.GameObject x))
+
+(defn set-mask! [o s]
+  (let [mask (if (string? s) (LayerMask/NameToLayer s) (int s))
+        ^UnityEngine.Transform|[]| ts (.GetComponentsInChildren o UnityEngine.Transform)]
+    (run! 
+      #(set! (.layer (.gameObject %)) mask) ts)))
 
 (def ^:private hit-buff (make-array UnityEngine.RaycastHit 200))
 
@@ -30,15 +36,19 @@
   ([^Vector3 a ^Vector3 b]
    (if (> (hit* a b) 0) (aget hit-buff 0)))
   ([^Vector3 a ^Vector3 b ^System.Double c]
-   (if (> (hit* a b c) 0) (aget hit-buff 0))))
+   (if (> (hit* a b c) 0) (aget hit-buff 0)))
+  ([^Vector3 a ^Vector3 b ^System.Double c d]
+   (if (> (Physics/RaycastNonAlloc a b hit-buff c d) 0) (aget hit-buff 0))))
 
-(defn hits [^Vector3 a ^Vector3 b]
-  (map #(aget hit-buff %) (range (hit* a b))))
+(defn hits 
+  ([^Vector3 a ^Vector3 b]
+    (map #(aget hit-buff %) (range (hit* a b))))
+  ([^Vector3 a ^Vector3 b ^System.Double c]
+    (map #(aget hit-buff %) (range (hit* a b c))))
+  ([^Vector3 a ^Vector3 b ^System.Double c d]
+    (map #(aget hit-buff %) (range (Physics/RaycastNonAlloc a b hit-buff c d)))))
 
-(defn range-hits [^Vector3 a ^Vector3 b ^System.Double len]
-  (map #(aget hit-buff %) (range (hit* a b len))))
 
-#_(reduce v3+ (map #(.point %)  (hits (v3) (v3 0 -1 0))))
 
 (defn gravity [] (Physics/gravity))
 
