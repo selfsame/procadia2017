@@ -48,6 +48,3 @@
   (make-level 1))
 
 '(start nil nil)
-
-'(hook+ (the start) :start :start #'start)
-'(hook+ (the player-input) :update #'input.core/push-input!)
