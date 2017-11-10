@@ -88,6 +88,7 @@
   :type :blob
   :id :blob
   :prefab :parts/blob
+  :hp 3
   :mount-points {
     :arm1 {:tentacle 1}
     :arm2 {:tentacle 1}
@@ -116,7 +117,8 @@
 (part {
   :type :head
   :id :eyeball
-  :prefab :parts/eyeball})
+  :prefab :parts/eyeball
+  :hp 2})
 
 (part {
   :type [:arm :tentacle]
@@ -130,6 +132,7 @@
   :type :item
   :id :raygun
   :prefab :parts/raygun
+  :power 1
   :hooks {
     :start (fn [root this] (cmpt+ this Timer))
     :update #'gun-update}})

@@ -110,8 +110,11 @@
             {} @parts) #(into-array PartHook %)))
       (hook+ root :start ::start #'entity-start)
       (hook+ root :update ::update #'entity-update)
-      (state+ root :hp 10)
-      (state+ root :max-hp 10)
+      (let [hp (min 4 (reduce #(+ %1 (get %2 :hp 1)) 0 @parts))
+            power (reduce #(+ %1 (get %2 :power 0)) 0 @parts)]
+        (state+ root :hp hp)
+        (state+ root :max-hp hp)
+        (state+ root :power power))
       (skin-color! root (color (?f 1)(?f 1)(?f 1)))
       (rotate! root (v3 0 (?f 360) 0))
       root)))

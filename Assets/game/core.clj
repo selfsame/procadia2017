@@ -12,7 +12,8 @@
     [game.entity :refer :all]
     game.play
     game.ai
-    selfsame))
+    selfsame
+    clojure.core.server))
 
 (defn update-camera [o _]
   (position! o 
@@ -20,7 +21,7 @@
           (v3+ (>v3 @PLAYER) (v3 -50 70 -50)) 0.1)))
 
 (defn make-level [depth]
-  (let [world (game.world/make-world :worlds/cubeworld 35 35)
+  (let [world (game.world/make-world :worlds/cubeworld 45 45)
         _ (local-scale! world (v3 2))
         spawn-points (game.world/spawn-points)
         player-input (clone! :player-input)
