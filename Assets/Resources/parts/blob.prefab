@@ -68,8 +68,6 @@ GameObject:
   - component: {fileID: 23717780620215574}
   - component: {fileID: 64870842482751048}
   - component: {fileID: 135002905720064640}
-  - component: {fileID: 114289220088619710}
-  - component: {fileID: 114153393115676866}
   m_Layer: 0
   m_Name: blob
   m_TagString: Untagged
@@ -272,34 +270,6 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 1.00000005e-20
   m_Mesh: {fileID: 4300006, guid: d0f9e325312f74626851910152b7865d, type: 3}
---- !u!114 &114153393115676866
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1399554166455240}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98269a5891b3245db82aaf98a8faa9a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  edn: '[{:arcadia.internal.hook-help/key :default, :arcadia.internal.hook-help/fn
-    #''selfsame/kino-settle, :arcadia.internal.hook-help/pamv-data [:default]}]'
-  arcadiaState: {fileID: 114289220088619710}
---- !u!114 &114289220088619710
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1399554166455240}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68bab27575ee84411b029b5f5e98734f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  edn: '{}'
-  objectDatabaseIds: 
-  objectDatabaseObjects: []
 --- !u!135 &135002905720064640
 SphereCollider:
   m_ObjectHideFlags: 1

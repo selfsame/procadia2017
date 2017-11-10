@@ -2,20 +2,11 @@
   (use
     arcadia.core
     arcadia.linear
-    hard.core)
+    hard.core
+    hard.physics)
   (import 
     [OverlapWFC]
     [UnityEngine GameObject]))
-
-
-
-
-(defn arm [entity]
-  {:object (GameObject. "arm")
-   :mounts [{:point (v3 1 0 0) :type :weapon}]
-   :update (fn [this input])
-   :hp 10})
-
 
 (defn spawn-points []
   (remove null-obj? (shuffle (objects-tagged "spawn"))))
@@ -32,4 +23,5 @@
     (.Run wfc)
     (destroy wfc)
     (destroy-immediate input)
+    (set-mask! overlap "level")
     overlap))

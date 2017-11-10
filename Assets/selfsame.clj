@@ -9,16 +9,19 @@
     game.data
     tween.core)
   (require
-    [magic.api :as m])
+    [magic.api :as m]
+    game.fx
+    game.play)
   (import 
     Bone
     Timer
     [UnityEngine Mathf Time GameObject]))
 
 
-(defn feet-move [o this movement] 
+(defn feet-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
   (when movement 
-    (let [movement 
+    (let [^UnityEngine.GameObject axis @CAMERA-AXIS
+          movement 
           (.TransformDirection 
             (.transform @CAMERA-AXIS) 
             (v3 (.x movement) 0 (.y movement)))
@@ -34,30 +37,31 @@
   (let [{:keys [aim mouse-intersection]} (state o :input)
         ^UnityEngine.Vector2 aim aim]
     (when aim 
-      ;TODO recticule is a global thing
-      (position! @AIM mouse-intersection)
       (lerp-look! this (v3+ (>v3 this) 
                          (v3 (.x aim) 0 (.y aim))) 0.4))))
 
-(defn arm-update [o this aim]
-  (let [{:keys [movement aim mouse-intersection]} (state o :input)]
-    (when aim 
-      (look-at! this (v3+ mouse-intersection (v3 0 1 0)) (v3 0 1 0)))))
-
-
-(defn gun-update [o this]
+(defn gun-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
   (let [buttons-pressed (:buttons-pressed (state o :input))
         ^Timer timer (cmpt this Timer)] 
     (set! (.value timer) (int (+ (.value timer) 1)))
     (when (and (:fire buttons-pressed)
                (> (.value timer) 10))   
         (set! (.value timer) (int 0))
-        (let [bullet (clone! :bullets/pellet (>v3 this))]
-          (set! (.rotation (.transform bullet)) (.rotation (.transform this)))
+        (let [bullet (clone! :bullets/pellet)
+              layer (int (state o :mask))
+              ^UnityEngine.Transform btrf (.transform bullet)]
+          (position! bullet (>v3 this))
+          (set! (.rotation btrf) (.rotation (.transform this)))
           (timeline*
             (fn [] 
+              (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 20) layer)]
+                (game.play/damage (.gameObject (.collider hit)) 2)
+                (let [spark (clone! :fx/spark)] 
+                  (position! spark (.point hit))
+                  (destroy spark 0.5))
+                (destroy bullet 0.01))
               (position! bullet 
-                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 40)))))))
+                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 20)))))))
           (destroy bullet 3.0)))))
 
 (part {
@@ -65,7 +69,8 @@
   :id :business
   :prefab :parts/boots
   :mount-points {
-    :body {:body 1}} 
+    :body {:body 5
+           :blob 1}} 
   :hooks {
     :move #'feet-move}})
 
@@ -74,15 +79,16 @@
   :id :business
   :prefab :parts/business-body
   :mount-points {
-    :neck {:head 1}
+    :neck {:head 3 :tentacle 1}
     :left-arm {:arm 1 }
     :right-arm {:arm 1 }} 
   :hooks {:update #'body-update}})
 
 (part {
-  :type :body
+  :type :blob
   :id :blob
   :prefab :parts/blob
+  :hp 3
   :mount-points {
     :arm1 {:tentacle 1}
     :arm2 {:tentacle 1}
@@ -98,8 +104,7 @@
   :prefab :parts/business-head
   :hooks {
     :update 
-    (fn [root this] )
-    }})
+    (fn [root this])}})
 
 (part {
   :type :arm
@@ -107,13 +112,13 @@
   :prefab :parts/business-arm
   :mount-points {
     :item {:item 1}}
-  :hooks {:aim #'arm-update}})
+  :hooks {:aim #'game.play/arm-update}})
 
 (part {
   :type :head
   :id :eyeball
-  :prefab :parts/eyeball})
-
+  :prefab :parts/eyeball
+  :hp 2})
 
 (part {
   :type [:arm :tentacle]
@@ -127,32 +132,14 @@
   :type :item
   :id :raygun
   :prefab :parts/raygun
+  :power 1
   :hooks {
     :start (fn [root this] (cmpt+ this Timer))
     :update #'gun-update}})
 
 
-(defn kino-settle [^UnityEngine.GameObject o _]
-  (let [root (.. o transform root gameObject)
-        rb (cmpt root UnityEngine.Rigidbody)]
-    (set! (.isKinematic rb) true)
-    (timeline*
-      (wait 0.2)
-      #(do (set! (.isKinematic rb) false) nil))))
 
 
-(defn attach-rb [o _]
-  (let [root (.. o transform root gameObject)
-        rb (cmpt root UnityEngine.Rigidbody)
-        hj (cmpt+ o UnityEngine.HingeJoint)]
-    (log root rb)
-    (set! (.isKinematic (->rigidbody o)) false)
-    (set! (.connectedBody hj) rb)))
-
-(m/defn kino-match [^UnityEngine.GameObject o _]
-  ;(set! (.position (.transform o)) (.position (.transform (.parent (.transform o)))))
-  ;(set! (.rotation (.transform o)) (.rotation (.transform (.parent (.transform o)))))
-  )
 
 '(do
   (clear-cloned!)
@@ -169,16 +156,10 @@
           (set! (.connectedBody hj) (cmpt prev UnityEngine.Rigidbody))
           (set! (.useLimits hj) true)
           (set! (.min (.limits hj)) -10)
-          (set! (.max (.limits hj)) 10)
-          )
-        bone
-        )
-      o
-      bones)
-
-    ))
+          (set! (.max (.limits hj)) 10))
+        bone)
+      o bones)))
 
 '(hook+ (the blob) :start #'kino-settle)
-
 '(hook+ (the rag-tentacle-k) :update #'kino-match)
 

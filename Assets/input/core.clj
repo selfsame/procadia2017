@@ -52,4 +52,4 @@
   (let [other (arc/state this :output-obj)]
     (when other
       (arc/update-state other :input update-input-state!
-                        (.position (.transform other))))))
+                        (lin/v3+ (lin/v3 0 1.2 0) (.position (.transform other)))))))

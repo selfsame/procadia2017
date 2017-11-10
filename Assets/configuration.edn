@@ -1,1 +1,2 @@
-{:dependencies [[nasser/magic "0.0.1-SNAPSHOT"]]}
+{:dependencies [[nasser/magic "0.0.1-SNAPSHOT"]]
+ :build-namespaces [game.core]}

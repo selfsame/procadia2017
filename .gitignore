@@ -25,4 +25,5 @@ sysinfo.txt
 /*.sublime-workspace
 
 
-/*.blend1
+*.blend1
+*.\*arcadia-repl\*.cljs
