@@ -21,8 +21,8 @@
           (v3+ (>v3 @PLAYER) (v3 -50 70 -50)) 0.1)))
 
 (defn make-level [depth]
-  (let [world (game.world/make-world :worlds/cubeworld 45 45)
-        _ (local-scale! world (v3 2))
+  (let [world (game.world/make-world :worlds/cubeworld 25 25)
+        _ (local-scale! world (v3 4))
         spawn-points (game.world/spawn-points)
         player-input (clone! :player-input)
         player (game.entity/make-entity :player-feet (* depth 10))

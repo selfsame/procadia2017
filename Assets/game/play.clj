@@ -58,5 +58,5 @@
 
 (defn arm-update [o this aim]
   (let [{:keys [movement aim mouse-intersection]} (state o :input)]
-    (when aim 
-      (look-at! this (v3+ mouse-intersection (v3 0 (.y (>v3 this)) 0)) (v3 0 1 0)))))
+    (when mouse-intersection 
+      (look-at! this (v3+ mouse-intersection (v3 0 0 0)) (v3 0 1 0)))))
