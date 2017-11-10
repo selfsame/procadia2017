@@ -21,10 +21,7 @@
 (defn feet-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
   (when movement 
     (let [^UnityEngine.GameObject axis @CAMERA-AXIS
-          movement 
-          (.TransformDirection 
-            (.transform @CAMERA-AXIS) 
-            (v3 (.x movement) 0 (.y movement)))
+          movement (v3 (.x movement) 0 (.y movement))
           rb (->rigidbody o)
           vel (v3* (v3 (.x movement) -0.5 (.z movement)) 15)
           speed (.magnitude movement)]

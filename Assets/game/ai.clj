@@ -9,7 +9,7 @@
   (require
     game.entity
     game.fx)
-  (import [UnityEngine Debug]))
+  (import [UnityEngine Debug Vector3]))
 
 (defn input! [o k v] (update-state o :input #(assoc % k v)))
 
@@ -18,15 +18,33 @@
     (let [target (>v3 @PLAYER)
           o->t (v3- target (>v3 o))
           dist (.magnitude o->t)]
-      (if (< dist n) false true))))
+      (if (< dist n) true false))))
 
 (defn charge [o]
   (fn [] 
-    (let [target (>v3 @PLAYER)
+    (let [target (v3+ (>v3 @PLAYER) (v3 0 1.2 0))
           o->t (v3- target (>v3 o))
           movement (.normalized o->t)
           to-target (v2 (.x movement) (.z movement))]
+      (Debug/DrawLine (>v3 o) target (color 1 0 0))    
       (input! o :movement to-target)
+      (input! o :aim to-target)
+      (input! o :mouse-intersection target)) true))
+
+(defn strafe [o n]
+  (fn [] 
+    (let [target (>v3 @PLAYER)
+          o->t (.normalized (v3- target (>v3 o)))
+          perp (Vector3/Cross o->t (v3 0 1 0))]
+      (Debug/DrawLine (>v3 o) (v3+ (>v3 o) perp) (color 0 1 0))
+      (input! o :movement (v2 (.x perp) (.z perp)))) ))
+
+(defn aim [o]
+  (fn [] 
+    (let [target (v3+ (>v3 @PLAYER) (v3 0 1.2 0))
+          o->t (v3- target (>v3 o))
+          movement (.normalized o->t)
+          to-target (v2 (.x movement) (.z movement))]
       (input! o :aim to-target)
       (input! o :mouse-intersection target))))
 
@@ -42,26 +60,32 @@
   (fn [] (input! o :movement (v2 0)) nil))
 
 (defn fire [o]
-  (fn [] (input! o :buttons-pressed #{:fire})))
+  (fn [] (input! o :buttons-pressed #{:fire}) nil))
 
 (defn end-fire [o]
   (fn [] (input! o :buttons-pressed #{}) nil))
 
 (defn ai-start [o _]
-  (state+ o ::target @PLAYER)
   (timeline* :loop
     (wait (?f 1))
-    (player-in-range? o 40)
+    (NOT (player-in-range? o 40))
     (AND (charge o)
-         (wait 1.5))
+         (NOT (player-in-range? o 6))
+         (wait (?f 0.3 1.5)))
     (stop o)
-    (AND (fire o)
+    (fire o)
+    (AND (aim o)
          (wait (?f 0.5 2.0)))
     (end-fire o)
     (wander o)
     (wait (?f 0.5 1.0))
+    (AND (strafe o (rand-nth [-1 1]))
+         (aim o)
+         (wait (?f 0.5 2.0)))
     (stop o)))
 
+
+'(timeline-1 [(fn [] (wait 1)) (fn [] #(log "hello"))])
 
 
 

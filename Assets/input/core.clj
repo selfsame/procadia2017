@@ -1,7 +1,8 @@
 (ns input.core
   (:require [arcadia.core :as arc]
             [arcadia.linear :as lin]
-            [magic.api :as m])
+            [magic.api :as m]
+            [game.data])
   (:import [UnityEngine Input Vector3 Camera Physics Plane Ray]))
 
 (def input-axes {:horizontal "Horizontal"
@@ -32,9 +33,12 @@
 
 (defn update-input-state!
   [old-state player-pos]
-  (let [mouse-intersect (get-mouse-on-plane! player-pos)]
-    {:movement (.normalized (lin/v2 (Input/GetAxisRaw (input-axes :horizontal))
-                                    (Input/GetAxisRaw (input-axes :vertical))))
+  (let [mouse-intersect (get-mouse-on-plane! player-pos)
+        movement (.TransformDirection 
+                  (.transform @game.data/CAMERA-AXIS)
+                  (.normalized (lin/v3 (Input/GetAxisRaw (input-axes :horizontal)) 0
+                      (Input/GetAxisRaw (input-axes :vertical)))))]
+    {:movement (.normalized (lin/v2 (.x movement) (.z movement)))
      ;; TODO: update aim to use a raycast from the camera through the mouse rather
      ;; than a direct mouse position, so that aiming doesn't care about camera angle
      :aim (.normalized (lin/v2- (lin/v2 (.x mouse-intersect) (.z mouse-intersect))
