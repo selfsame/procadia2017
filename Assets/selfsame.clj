@@ -7,7 +7,8 @@
     hard.animation
     game.entity
     game.data
-    tween.core)
+    tween.core
+    game.ai)
   (require
     [magic.api :as m]
     game.fx
@@ -115,7 +116,20 @@
   :type :head
   :id :eyeball
   :prefab :parts/eyeball
-  :hp 2})
+  :hp 2
+  :ai 
+  (behaviour [o]
+    (NOT (player-in-range? o 40))
+    (AND (charge o)
+         (NOT (player-in-range? o 10))
+         (wait (?f 0.3 1)))
+    (stop o)
+    (fire o)
+    (AND (strafe o (rand-nth [-1 1]))
+         (aim o)
+         (wait (?f 0.2 1.0)))
+    (end-fire o)
+    (stop o))})
 
 (part {
   :type [:arm :tentacle]

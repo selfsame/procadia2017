@@ -7,9 +7,12 @@
     tween.core
     game.data)
   (require
-    game.entity
     game.fx)
   (import [UnityEngine Debug Vector3]))
+
+(defmacro behaviour [bind & args]
+  (let [wrapped (map #(list 'fn '[] %) args)]
+    `(fn ~bind [~@wrapped])))
 
 (defn input! [o k v] (update-state o :input #(assoc % k v)))
 
@@ -65,8 +68,8 @@
 (defn end-fire [o]
   (fn [] (input! o :buttons-pressed #{}) nil))
 
-(defn ai-start [o _]
-  (timeline* :loop
+(def default-ai 
+  (behaviour [o]
     (wait (?f 1))
     (NOT (player-in-range? o 40))
     (AND (charge o)
@@ -84,27 +87,7 @@
          (wait (?f 0.5 2.0)))
     (stop o)))
 
-
-'(timeline-1 [(fn [] (wait 1)) (fn [] #(log "hello"))])
-
-
-
-(defn ai-update [o _]
-  #_(let [target (>v3 @PLAYER)
-        o->t (v3- target (>v3 o))
-        movement (.normalized o->t)
-        to-target (v2 (.x movement) (.z movement))
-        dist (.magnitude o->t)
-        h (hit (v3+ (>v3 o) (v3 0 0.5 0)) o->t dist (mask "level"))]
-    ;(if h (Debug/DrawLine (>v3 o) (.point h) (color 1 0 0)))
-    (if (> 60 dist)
-      (state+ o :input {
-        :movement 
-        (if (> dist 15.0) to-target 
-            (if (> 10.0 dist) (v2* to-target -1)
-                (v2 0)))
-        :mouse-intersection target
-        :aim to-target
-        :buttons-pressed 
-        (if (and (not h) (< (rand) 0.2)) #{:fire} #{})})
-      (state+ o :input {}))) )
+(defn ai-start [o _]
+  (timeline-1 
+    (cycle (or (state o :game.entity/ai) 
+               (default-ai o)))))
