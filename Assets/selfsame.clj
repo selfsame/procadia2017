@@ -18,9 +18,10 @@
     [UnityEngine Mathf Time GameObject]))
 
 
-(defn feet-move [o this movement] 
+(defn feet-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
   (when movement 
-    (let [movement 
+    (let [^UnityEngine.GameObject axis @CAMERA-AXIS
+          movement 
           (.TransformDirection 
             (.transform @CAMERA-AXIS) 
             (v3 (.x movement) 0 (.y movement)))
@@ -36,28 +37,31 @@
   (let [{:keys [aim mouse-intersection]} (state o :input)
         ^UnityEngine.Vector2 aim aim]
     (when aim 
-      ;TODO recticule is a global thing
-      (position! @AIM mouse-intersection)
       (lerp-look! this (v3+ (>v3 this) 
                          (v3 (.x aim) 0 (.y aim))) 0.4))))
 
-(defn gun-update [o this]
+(defn gun-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
   (let [buttons-pressed (:buttons-pressed (state o :input))
         ^Timer timer (cmpt this Timer)] 
     (set! (.value timer) (int (+ (.value timer) 1)))
     (when (and (:fire buttons-pressed)
                (> (.value timer) 10))   
         (set! (.value timer) (int 0))
-        (let [bullet (clone! :bullets/pellet)]
+        (let [bullet (clone! :bullets/pellet)
+              layer (int (state o :mask))
+              ^UnityEngine.Transform btrf (.transform bullet)]
           (position! bullet (>v3 this))
-          (set! (.rotation (.transform bullet)) (.rotation (.transform this)))
+          (set! (.rotation btrf) (.rotation (.transform this)))
           (timeline*
             (fn [] 
-              (when-let [hit (hit (>v3 bullet) (.forward (.transform bullet)) (∆ 40))]
+              (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 20) layer)]
                 (game.play/damage (.gameObject (.collider hit)) 2)
+                (let [spark (clone! :fx/spark)] 
+                  (position! spark (.point hit))
+                  (destroy spark 0.5))
                 (destroy bullet 0.01))
               (position! bullet 
-                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 40)))))))
+                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 20)))))))
           (destroy bullet 3.0)))))
 
 (part {
@@ -65,7 +69,8 @@
   :id :business
   :prefab :parts/boots
   :mount-points {
-    :body {:body 1}} 
+    :body {:body 5
+           :blob 1}} 
   :hooks {
     :move #'feet-move}})
 
@@ -74,13 +79,13 @@
   :id :business
   :prefab :parts/business-body
   :mount-points {
-    :neck {:head 1}
+    :neck {:head 3 :tentacle 1}
     :left-arm {:arm 1 }
     :right-arm {:arm 1 }} 
   :hooks {:update #'body-update}})
 
 (part {
-  :type :body
+  :type :blob
   :id :blob
   :prefab :parts/blob
   :mount-points {

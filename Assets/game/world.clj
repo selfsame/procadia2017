@@ -2,7 +2,8 @@
   (use
     arcadia.core
     arcadia.linear
-    hard.core)
+    hard.core
+    hard.physics)
   (import 
     [OverlapWFC]
     [UnityEngine GameObject]))
@@ -22,4 +23,5 @@
     (.Run wfc)
     (destroy wfc)
     (destroy-immediate input)
+    (set-mask! overlap "level")
     overlap))

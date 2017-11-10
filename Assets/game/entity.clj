@@ -56,8 +56,6 @@
 
 (defn entity-start [^UnityEngine.GameObject o _]
   (state+ o :entity? true)
-  (state+ o :hp 10)
-  (state+ o :max-hp 10)
   (let [input    (state o :input)
         hooks    (state o ::hooks)]
     (run!
@@ -112,6 +110,8 @@
             {} @parts) #(into-array PartHook %)))
       (hook+ root :start ::start #'entity-start)
       (hook+ root :update ::update #'entity-update)
+      (state+ root :hp 10)
+      (state+ root :max-hp 10)
       (skin-color! root (color (?f 1)(?f 1)(?f 1)))
       (rotate! root (v3 0 (?f 360) 0))
       root)))
@@ -119,5 +119,4 @@
 
 '(do
   (clear-cloned!)
-  (make-entity :feet 20 12))
-
+  (make-entity :feet 20))

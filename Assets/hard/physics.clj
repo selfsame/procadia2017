@@ -5,11 +5,16 @@
 
 (defn gob? [x] (instance? UnityEngine.GameObject x))
 
-(defn set-mask! [o s]
-  (let [mask (if (string? s) (LayerMask/NameToLayer s) (int s))
+(defn mask [n]
+  (int (bit-shift-left 1 (if (string? n) (LayerMask/NameToLayer n) n))))
+
+'(LayerMask/GetMask (into-array System.String ["player"]))
+
+(defn set-mask! [o n]
+  (let [m (int (if (string? n) (LayerMask/NameToLayer n) n))
         ^UnityEngine.Transform|[]| ts (.GetComponentsInChildren o UnityEngine.Transform)]
     (run! 
-      #(set! (.layer (.gameObject %)) mask) ts)))
+      #(set! (.layer (.gameObject %)) m) ts)))
 
 (def ^:private hit-buff (make-array UnityEngine.RaycastHit 200))
 
@@ -32,13 +37,15 @@
   ([^Vector3 a ^Vector3 b ^System.Double c]
     (raycast-non-alloc a b hit-buff c)))
 
+(def zero-long (long 0))
+
 (defn hit 
   ([^Vector3 a ^Vector3 b]
    (if (> (hit* a b) 0) (aget hit-buff 0)))
   ([^Vector3 a ^Vector3 b ^System.Double c]
    (if (> (hit* a b c) 0) (aget hit-buff 0)))
   ([^Vector3 a ^Vector3 b ^System.Double c d]
-   (if (> (Physics/RaycastNonAlloc a b hit-buff c d) 0) (aget hit-buff 0))))
+   (if (> (Physics/RaycastNonAlloc a b hit-buff c d) zero-long) (aget hit-buff zero-long))))
 
 (defn hits 
   ([^Vector3 a ^Vector3 b]
@@ -56,8 +63,8 @@
 
 (defn rigidbody? [o] (instance? UnityEngine.Rigidbody o))
 
-(defn ->rigidbody [v]
-  (if-let [o (.gameObject v)] (.GetComponent o UnityEngine.Rigidbody) nil))
+(defn ^UnityEngine.Rigidbody ->rigidbody [^UnityEngine.GameObject o]
+  (.GetComponent o UnityEngine.Rigidbody))
 
 (defn ->rigidbody2d [v]
   (if-let [o (.gameObject v)] (.GetComponent o UnityEngine.Rigidbody2D) nil))

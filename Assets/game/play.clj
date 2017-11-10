@@ -19,6 +19,18 @@
       (wait 0.2)
       #(do (set! (.isKinematic rb) false) nil))))
 
+(defn set-player! [o]
+  (reset! PLAYER o)
+  (state+ @INPUT :output-obj @PLAYER)
+  (set-mask! o "player")
+  (state+ o :mask (int (+ (mask "level") (mask "monster"))))
+  (state+ o :hp 30)
+  (state+ o :max-hp 30)
+  (hook+ o :update :target
+    (fn [o _] 
+      (when-let [input (state o :input)]
+        (position! @AIM (-> input :mouse-intersection))))))
+
 (defn kill [o]
   (let [seed (:game.entity/seed (state o))
         start-type (:game.entity/start-type (state o))
@@ -35,8 +47,7 @@
     (position! new-player ppos)
     (rotation! new-player prot)
     (kino-settle new-player nil)
-    (reset! PLAYER new-player)
-    (state+ @INPUT :output-obj @PLAYER)))
+    (set-player! new-player)))
 
 (defn damage [o n]
   (let [root (.gameObject (.root (.transform o)))]
@@ -49,4 +60,3 @@
   (let [{:keys [movement aim mouse-intersection]} (state o :input)]
     (when aim 
       (look-at! this (v3+ mouse-intersection (v3 0 (.y (>v3 this)) 0)) (v3 0 1 0)))))
-
