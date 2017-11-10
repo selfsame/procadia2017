@@ -9,12 +9,18 @@
     input.core
     game.world
     game.entity
-    selfsame))
+    selfsame
+    [magic.api :as m])
+  (import [UnityEngine GameObject Vector3]))
 
-(defn update-camera [o _]
-  (position! o 
-    (lerp (>v3 o)
-          (v3+ (>v3 @PLAYER) (v3 -50 70 -50)) 0.1)))
+(m/defn update-camera [^GameObject o _]
+  (let [^GameObject player @PLAYER]
+    (set! (>v3 o) 
+          (Vector3/Lerp
+            (>v3 o)
+            (v3+ (>v3 player) (v3 -50 70 -50))
+            0.1)))
+  nil)
 
 (defn make-level [depth]
   (let [world (game.world/make-world :worlds/cubeworld 40 40)
