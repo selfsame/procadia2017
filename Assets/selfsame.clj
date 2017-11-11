@@ -21,10 +21,12 @@
 
 (defn feet-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
   (when movement 
-    (let [^UnityEngine.GameObject axis @CAMERA-AXIS
+    (let [last-vel (or (state this ::move) (v3 0))
+          movement (v3* (v3+ movement last-vel) 0.5)
           rb (->rigidbody o)
-          vel (v3* movement 15)
+          vel (v3* movement 12)
           speed (.magnitude movement)]
+      (state+ this ::move movement)
       (param-float this "walkspeed" (* speed 1.5))
       (set! (.velocity rb) vel)
       (when (> (.magnitude movement) 0.001)

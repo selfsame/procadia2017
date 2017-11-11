@@ -40,7 +40,7 @@
     (let [input (state o :input)
           target (>v3 @PLAYER)
           o->t (.normalized (v3- target (>v3 o)))
-          perp (Vector3/Cross o->t (v3 0 1 0))]
+          perp (v3* (Vector3/Cross o->t (v3 0 1 0)) n)]
       (Debug/DrawLine (>v3 o) (v3+ (>v3 o) perp) (color 0 1 0))
       (set! (.movement input) perp))))
 
