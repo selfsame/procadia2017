@@ -5,7 +5,9 @@
     hard.core
     hard.seed)
   (require
-    [arcadia.internal.benchmarking :as bench]))
+    input.core)
+  (import 
+    [UnityEngine Vector3]))
 
 (defonce PARTS (volatile! {}))
 
@@ -56,8 +58,7 @@
 
 (defn entity-start [^UnityEngine.GameObject o _]
   (state+ o :entity? true)
-  (let [input    (state o :input)
-        hooks    (state o ::hooks)]
+  (let [hooks    (state o ::hooks)]
     (run!
       (fn [^PartHook ph] ((.hook ph) o (.part ph)))
       (:start hooks))))
@@ -65,8 +66,8 @@
 (defn entity-update [^UnityEngine.GameObject o _]
   (let [input    (state o :input)
         hooks    (state o ::hooks)
-        movement (:movement input)
-        mouse-x  (:mouse-intersection input)]
+        movement (if input (.movement input))
+        target   (if input (.target input))]
     ;; run! is preferred over (dorun (map ...))
     (run!
       (fn [^PartHook ph] ((.hook ph) o (.part ph)))
@@ -75,7 +76,7 @@
       (fn [^PartHook ph] ((.hook ph) o (.part ph) movement))
       (:move hooks))
     (run!
-      (fn [^PartHook ph] ((.hook ph) o (.part ph) mouse-x))
+      (fn [^PartHook ph] ((.hook ph) o (.part ph) target))
       (:aim hooks))))
 
 (defn skin-color! [o c]

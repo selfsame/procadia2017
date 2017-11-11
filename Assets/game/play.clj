@@ -7,6 +7,7 @@
     tween.core
     game.data)
   (require
+    input.core
     game.entity
     game.fx)
   (import [UnityEngine]))
@@ -22,6 +23,7 @@
 (defn set-player! [o]
   (reset! PLAYER o)
   (state+ @INPUT :output-obj @PLAYER)
+  (state+ o :input (input.core/new-control))
   (set-mask! o "player")
   (state+ o :mask (int (+ (mask "level") (mask "monster"))))
   (state+ o :hp 30)
@@ -29,7 +31,7 @@
   (hook+ o :update :target
     (fn [o _] 
       (when-let [input (state o :input)]
-        (position! @AIM (-> input :mouse-intersection))))))
+        (position! @AIM (.target input))))))
 
 (defn kill [o]
   (let [seed (:game.entity/seed (state o))
@@ -57,6 +59,6 @@
           (kill root)))))
 
 (defn arm-update [o this aim]
-  (let [{:keys [movement aim mouse-intersection]} (state o :input)]
-    (when mouse-intersection 
-      (look-at! this (v3+ mouse-intersection (v3 0 0 0)) (v3 0 1 0)))))
+  (let [input (state o :input)]
+    (when input
+      (look-at! this (v3+ (.target input) (v3 0 1 0)) (v3 0 1 0)))))

@@ -16,15 +16,14 @@
   (import 
     Bone
     Timer
-    [UnityEngine Mathf Time GameObject]))
+    [UnityEngine Mathf Time GameObject Vector3]))
 
 
 (defn feet-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
   (when movement 
     (let [^UnityEngine.GameObject axis @CAMERA-AXIS
-          movement (v3 (.x movement) 0 (.y movement))
           rb (->rigidbody o)
-          vel (v3* (v3 (.x movement) -0.5 (.z movement)) 15)
+          vel (v3* movement 15)
           speed (.magnitude movement)]
       (param-float this "walkspeed" (* speed 1.5))
       (set! (.velocity rb) vel)
@@ -32,17 +31,16 @@
         (lerp-look! this (v3+ (>v3 this) movement) 0.2)))))
 
 (defn body-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
-  (let [{:keys [aim mouse-intersection]} (state o :input)
-        ^UnityEngine.Vector2 aim aim]
-    (when aim 
-      (lerp-look! this (v3+ (>v3 this) 
-                         (v3 (.x aim) 0 (.y aim))) 0.4))))
+  (let [input (state o :input)
+        ^Vector3 aim (.aim input)]
+    (when (> (.magnitude aim) 0.01) 
+      (lerp-look! this (v3+ (>v3 this) aim) 0.4))))
 
 (defn gun-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
-  (let [buttons-pressed (:buttons-pressed (state o :input))
+  (let [pressed (.pressed (state o :input))
         ^Timer timer (cmpt this Timer)] 
     (set! (.value timer) (int (+ (.value timer) 1)))
-    (when (and (:fire buttons-pressed)
+    (when (and (:fire pressed)
                (> (.value timer) 10))   
         (set! (.value timer) (int 0))
         (let [bullet (clone! :bullets/pellet)

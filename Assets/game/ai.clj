@@ -7,66 +7,70 @@
     tween.core
     game.data)
   (require
-    game.fx)
-  (import [UnityEngine Debug Vector3]))
+    game.fx
+    [magic.api :as m])
+  (import 
+    [UnityEngine Debug Vector3 GameObject]))
 
 (defmacro behaviour [bind & args]
   (let [wrapped (map #(list 'fn '[] %) args)]
     `(fn ~bind [~@wrapped])))
 
-(defn input! [o k v] (update-state o :input #(assoc % k v)))
 
-(defn player-in-range? [o n]
+(defn player-in-range? [^GameObject o n]
   (fn []
-    (let [target (>v3 @PLAYER)
+    (let [^Vector3 target (>v3 @PLAYER)
           o->t (v3- target (>v3 o))
           dist (.magnitude o->t)]
       (if (< dist n) true false))))
 
 (defn charge [o]
   (fn [] 
-    (let [target (v3+ (>v3 @PLAYER) (v3 0 1.2 0))
+    (let [input (state o :input)
+          target (v3+ (>v3 @PLAYER) (v3 0 1.2 0))
           o->t (v3- target (>v3 o))
-          movement (.normalized o->t)
-          to-target (v2 (.x movement) (.z movement))]
+          movement (.normalized o->t)]
       (Debug/DrawLine (>v3 o) target (color 1 0 0))    
-      (input! o :movement to-target)
-      (input! o :aim to-target)
-      (input! o :mouse-intersection target)) true))
+      (set! (.movement input) movement)
+      (set! (.aim input) movement)
+      (set! (.target input) target)) true))
 
 (defn strafe [o n]
   (fn [] 
-    (let [target (>v3 @PLAYER)
+    (let [input (state o :input)
+          target (>v3 @PLAYER)
           o->t (.normalized (v3- target (>v3 o)))
           perp (Vector3/Cross o->t (v3 0 1 0))]
       (Debug/DrawLine (>v3 o) (v3+ (>v3 o) perp) (color 0 1 0))
-      (input! o :movement (v2 (.x perp) (.z perp)))) ))
+      (set! (.movement input) perp))))
 
 (defn aim [o]
   (fn [] 
-    (let [target (v3+ (>v3 @PLAYER) (v3 0 1.2 0))
+    (let [input (state o :input)
+          target (v3+ (>v3 @PLAYER) (v3 0 1.2 0))
           o->t (v3- target (>v3 o))
-          movement (.normalized o->t)
-          to-target (v2 (.x movement) (.z movement))]
-      (input! o :aim to-target)
-      (input! o :mouse-intersection target))))
+          movement (.normalized o->t)]
+      (set! (.aim input) movement)
+      (set! (.target input) target))))
 
 (defn wander [o]
   (fn [] 
-    (let [movement (.normalized (?circle 2.0))]
-      (input! o :movement movement)
-      (input! o :aim movement)
-      (input! o :mouse-intersection (v3+ (>v3 o) (v3 (.x movement) 0 (.y movement)))) 
+    (let [input (state o :input)
+          m (.normalized (?circle 2.0))
+          movement (v3 (.x m) 0 (.y m))]
+      (set! (.movement input) movement)
+      (set! (.aim input) movement)
+      (set! (.target input) (v3+ (>v3 o) movement)) 
       nil)))
 
 (defn stop [o]
-  (fn [] (input! o :movement (v2 0)) nil))
+  (fn [] (set! (.movement (state o :input)) (v3 0)) nil))
 
 (defn fire [o]
-  (fn [] (input! o :buttons-pressed #{:fire}) nil))
+  (fn [] (set! (.pressed (state o :input)) #{:fire}) nil))
 
 (defn end-fire [o]
-  (fn [] (input! o :buttons-pressed #{}) nil))
+  (fn [] (set! (.pressed (state o :input)) #{}) nil))
 
 (def default-ai 
   (behaviour [o]

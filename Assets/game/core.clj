@@ -39,7 +39,7 @@
               (let [monster (game.entity/make-entity (* depth 10))]
                 (position! monster (.position (.transform sp)))
                 (hook+ monster :start :ai #'game.ai/ai-start)
-                (hook+ monster :update :ai #'game.ai/ai-update)
+                (state+ monster :input (input.core/new-control))
                 (set-mask! monster "monster")
                 (state+ monster :mask (int (+ (mask "level") (mask "player"))))
                 monster))

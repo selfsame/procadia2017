@@ -11,15 +11,26 @@
 (def input-buttons {:fire 0
                     :special 1})
 
-(defn get-buttons
-  "Returns a set of keys from the map bttns.
-   The returned keys have values which return a truthy value when passed to fun."
-  [fun bttns]
-  (into #{} (map first
-            (filter
-             (fn [[key val]] val)
-             (map (fn [[key val]] [key (fun val)])
-                  (seq bttns))))))
+(deftype Control [
+  ^:volatile-mutable ^Vector3 movement
+  ^:volatile-mutable ^Vector3 aim
+  ^:volatile-mutable ^Vector3 target
+  ^:volatile-mutable ^clojure.lang.PersistentHashSet down
+  ^:volatile-mutable ^clojure.lang.PersistentHashSet pressed
+  ^:volatile-mutable ^clojure.lang.PersistentHashSet up])
+
+(defn new-control []
+  (let [v (lin/v3 0)
+        s #{}]
+    (Control. v v (lin/v3 1 0 0) s s s)))
+
+(defn get-buttons [fun]
+  (let [fire (fun 0)
+        special (fun 1)]
+    (cond (and fire special) #{:fire :special}
+          fire               #{:fire}
+          special            #{:special}
+          :else              #{})))
 
 (m/defn get-mouse-on-plane!
   [^Vector3 player-pos]
@@ -27,33 +38,31 @@
         ray (.ScreenPointToRay Camera/main Input/mousePosition)
         dist (float 0)
         max-dist (float 100)]
-    (if (.Raycast plane ray (by-ref dist))
-      (.GetPoint ray dist)
-      (.GetPoint ray max-dist))))
-
-(defn update-input-state!
-  [old-state player-pos]
-  (let [mouse-intersect (get-mouse-on-plane! player-pos)
-        movement (.TransformDirection 
-                  (.transform @game.data/CAMERA-AXIS)
-                  (.normalized (lin/v3 (Input/GetAxisRaw (input-axes :horizontal)) 0
-                      (Input/GetAxisRaw (input-axes :vertical)))))]
-    {:movement (.normalized (lin/v2 (.x movement) (.z movement)))
-     ;; TODO: update aim to use a raycast from the camera through the mouse rather
-     ;; than a direct mouse position, so that aiming doesn't care about camera angle
-     :aim (.normalized (lin/v2- (lin/v2 (.x mouse-intersect) (.z mouse-intersect))
-                                (lin/v2 (.x player-pos) (.z player-pos))))
-     :mouse-intersection mouse-intersect
-     :buttons-down (get-buttons #(Input/GetMouseButtonDown %) input-buttons)
-     :buttons-pressed (get-buttons #(Input/GetMouseButton %) input-buttons)
-     :buttons-up (get-buttons #(Input/GetMouseButtonUp %) input-buttons)}))
+    (or (if (.Raycast plane ray (by-ref dist))
+            (.GetPoint ray dist)
+            (.GetPoint ray max-dist))
+        (lin/v3 0))))
 
 (defn push-input!
-  "A function that grabs a referenced object from this object's state atom and updates its state to include input from the player this frame.
-
-  Generally this function should be associated with the update message on an empty, and the referenced object should be the player."
+  "A function that grabs a referenced object from this object's state atom and updates 
+  its state to include input from the player this frame.
+  Generally this function should be associated with the update message on an empty, 
+  and the referenced object should be the player."
   [this key]
-  (let [other (arc/state this :output-obj)]
-    (when other
-      (arc/update-state other :input update-input-state!
-                        (lin/v3+ (lin/v3 0 1.2 0) (.position (.transform other)))))))
+  (when-let [other (arc/state this :output-obj)]
+    (let [^Control control (or (arc/state other :input) 
+                               (arc/state (arc/state+ other :input (new-control)) :input))
+          ^Vector3 player-pos (.position (.transform other))
+          ^Vector3 target (get-mouse-on-plane! player-pos)
+          ^Vector3 movement (.TransformDirection 
+                              (.transform @game.data/CAMERA-AXIS)
+                              (.normalized (lin/v3 
+                                (Input/GetAxisRaw "Horizontal") 0
+                                (Input/GetAxisRaw "Vertical"))))
+          ^Vector3 aim (.normalized (lin/v3- target player-pos))]
+      (set! (.movement control) movement)
+      (set! (.aim control) aim)
+      (set! (.target control) target)
+      (set! (.down control) (get-buttons #(Input/GetMouseButtonDown %)))
+      (set! (.pressed control) (get-buttons #(Input/GetMouseButton %)))
+      (set! (.up control) (get-buttons #(Input/GetMouseButtonUp %))))))
