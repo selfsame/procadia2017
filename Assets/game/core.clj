@@ -27,8 +27,9 @@
   nil)
 
 (defn make-level [depth]
-  (let [world (game.world/make-world :worlds/cubeworld 25 25)
-        _ (local-scale! world (v3 4))
+  (let [world (game.world/make-world "worlds/world.xml" 12 12)
+        _ (local-scale! world (v3 20))
+        sun (clone! :sun)
         spawn-points (game.world/spawn-points)
         player-input (clone! :player-input)
         player (game.entity/make-entity :player-feet (* depth 10))
@@ -43,7 +44,13 @@
                 (set-mask! monster "monster")
                 (state+ monster :mask (int (+ (mask "level") (mask "player"))))
                 monster))
-            (take 20 (rest spawn-points))))
+            (take 30 (rest spawn-points))))
+        balls 
+        (run! 
+          (fn [spawn] 
+            (let [ball (clone! :prisoner-ball)]
+              (position! ball (v3+ (>v3 spawn) (v3 0 2 0)))))
+          (take 20 (drop 31 spawn-points)))
         camera (clone! :iso-camera)]
     (reset! INPUT player-input)
     (reset! CAMERA camera)
@@ -57,7 +64,7 @@
 
 (defn start [_ _]
   (clear-cloned!)
-  (destroy-immediate (the overlap))
+  (destroy-immediate (the tiled))
   (make-level 1))
 
 '(start nil nil)

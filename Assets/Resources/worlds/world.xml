@@ -1,0 +1,63 @@
+<set>
+  <tiles>
+<tile name="tiles/base-X" symmetry="X" weight="1.0"/>
+<tile name="tiles/square-X" symmetry="X" weight="0.5"/>
+<tile name="tiles/round-X" symmetry="X" weight="0.5"/>
+<tile name="tiles/dead-end-T" symmetry="T" weight="0.5"/>
+<tile name="tiles/cavern-I" symmetry="I" weight="1.0"/>
+<tile name="tiles/cavern-X" symmetry="X" weight="1.0"/>
+<tile name="tiles/cavern-T" symmetry="T" weight="2.0"/>
+<tile name="tiles/cavern-L" symmetry="L" weight="10.0"/>
+	</tiles>
+<neighbors>  <neighbor left="tiles/base-X 1" right="tiles/dead-end-T 1"/>
+  <neighbor left="tiles/square-X 0" right="tiles/base-X 0"/>
+  <neighbor left="tiles/base-X 1" right="tiles/base-X 1"/>
+  <neighbor left="tiles/dead-end-T 1" right="tiles/cavern-I 1"/>
+  <neighbor left="tiles/dead-end-T 3" right="tiles/dead-end-T 0"/>
+  <neighbor left="tiles/dead-end-T 0" right="tiles/base-X 1"/>
+  <neighbor left="tiles/dead-end-T 0" right="tiles/dead-end-T 0"/>
+  <neighbor left="tiles/dead-end-T 1" right="tiles/dead-end-T 3"/>
+  <neighbor left="tiles/base-X 1" right="tiles/round-X 1"/>
+  <neighbor left="tiles/cavern-I 0" right="tiles/cavern-I 0"/>
+  <neighbor left="tiles/cavern-I 1" right="tiles/cavern-I 1"/>
+  <neighbor left="tiles/cavern-I 0" right="tiles/dead-end-T 1"/>
+  <neighbor left="tiles/dead-end-T 3" right="tiles/round-X 1"/>
+  <neighbor left="tiles/cavern-I 1" right="tiles/cavern-T 2"/>
+  <neighbor left="tiles/cavern-I 1" right="tiles/cavern-T 3"/>
+  <neighbor left="tiles/base-X 1" right="tiles/cavern-L 1"/>
+  <neighbor left="tiles/cavern-I 0" right="tiles/round-X 0"/>
+  <neighbor left="tiles/round-X 0" right="tiles/dead-end-T 0"/>
+  <neighbor left="tiles/round-X 1" right="tiles/cavern-T 1"/>
+  <neighbor left="tiles/cavern-X 1" right="tiles/cavern-T 0"/>
+  <neighbor left="tiles/cavern-T 1" right="tiles/cavern-T 2"/>
+  <neighbor left="tiles/cavern-T 2" right="tiles/cavern-T 2"/>
+  <neighbor left="tiles/cavern-T 3" right="tiles/dead-end-T 0"/>
+  <neighbor left="tiles/cavern-X 0" right="tiles/dead-end-T 3"/>
+  <neighbor left="tiles/cavern-X 1" right="tiles/cavern-I 1"/>
+  <neighbor left="tiles/base-X 0" right="tiles/cavern-L 1"/>
+  <neighbor left="tiles/base-X 1" right="tiles/dead-end-T 2"/>
+  <neighbor left="tiles/cavern-L 1" right="tiles/cavern-L 0"/>
+  <neighbor left="tiles/cavern-L 2" right="tiles/cavern-L 0"/>
+  <neighbor left="tiles/cavern-L 1" right="tiles/cavern-I 1"/>
+  <neighbor left="tiles/cavern-T 1" right="tiles/dead-end-T 3"/>
+  <neighbor left="tiles/cavern-T 1" right="tiles/dead-end-T 3"/>
+  <neighbor left="tiles/cavern-T 2" right="tiles/dead-end-T 3"/>
+  <neighbor left="tiles/dead-end-T 1" right="tiles/cavern-L 3"/>
+  <neighbor left="tiles/cavern-L 3" right="tiles/cavern-I 0"/>
+  <neighbor left="tiles/cavern-L 0" right="tiles/cavern-I 0"/>
+  <neighbor left="tiles/cavern-I 1" right="tiles/cavern-L 0"/>
+  <neighbor left="tiles/dead-end-T 3" right="tiles/square-X 1"/>
+  <neighbor left="tiles/cavern-I 3" right="tiles/cavern-L 3"/>
+  <neighbor left="tiles/cavern-I 0" right="tiles/square-X 0"/>
+  <neighbor left="tiles/square-X 0" right="tiles/dead-end-T 0"/>
+  <neighbor left="tiles/square-X 1" right="tiles/cavern-T 1"/>
+  <neighbor left="tiles/cavern-T 3" right="tiles/cavern-T 1"/>
+  <neighbor left="tiles/cavern-L 0" right="tiles/cavern-I 0"/>
+  <neighbor left="tiles/square-X 1" right="tiles/cavern-L 2"/>
+  <neighbor left="tiles/cavern-L 1" right="tiles/cavern-T 0"/>
+  <neighbor left="tiles/cavern-L 2" right="tiles/cavern-T 3"/>
+  <neighbor left="tiles/round-X 0" right="tiles/cavern-L 1"/>
+  <neighbor left="tiles/cavern-L 2" right="tiles/cavern-X 1"/>
+  <neighbor left="tiles/cavern-T 3" right="tiles/cavern-L 2"/>
+	</neighbors>
+</set>

@@ -1,0 +1,233 @@
+fileFormatVersion: 2
+guid: bb2ac88bec9194670ad725b011510cbd
+timeCreated: 1510420889
+licenseType: Free
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: base-X
+    100002: base-X_001
+    100004: base-X_002
+    100006: base-X_003
+    100008: base-X_004
+    100010: base-X_005
+    100012: base-X_006
+    100014: base-X_007
+    100016: base-X_008
+    100018: base-X_009
+    100020: //RootNode
+    100022: cavern-I
+    100024: cavern-T
+    100026: cavern-X
+    100028: dead-end-T
+    100030: round-X
+    100032: square-X
+    100034: cavern-L
+    100036: square-X_001
+    100038: bounds
+    100040: bounds_001
+    100042: bounds_002
+    100044: bounds_003
+    100046: bounds_004
+    100048: bounds_005
+    100050: bounds_006
+    100052: spawn
+    100054: spawn_001
+    100056: spawn_002
+    100058: spawn_003
+    100060: spawn_004
+    100062: spawn_005
+    100064: spawn_006
+    100066: spawn_007
+    100068: spawn_008
+    100070: spawn_009
+    100072: spawn_010
+    400000: base-X
+    400002: base-X_001
+    400004: base-X_002
+    400006: base-X_003
+    400008: base-X_004
+    400010: base-X_005
+    400012: base-X_006
+    400014: base-X_007
+    400016: base-X_008
+    400018: base-X_009
+    400020: //RootNode
+    400022: cavern-I
+    400024: cavern-T
+    400026: cavern-X
+    400028: dead-end-T
+    400030: round-X
+    400032: square-X
+    400034: cavern-L
+    400036: square-X_001
+    400038: bounds
+    400040: bounds_001
+    400042: bounds_002
+    400044: bounds_003
+    400046: bounds_004
+    400048: bounds_005
+    400050: bounds_006
+    400052: spawn
+    400054: spawn_001
+    400056: spawn_002
+    400058: spawn_003
+    400060: spawn_004
+    400062: spawn_005
+    400064: spawn_006
+    400066: spawn_007
+    400068: spawn_008
+    400070: spawn_009
+    400072: spawn_010
+    2300000: base-X
+    2300002: base-X_001
+    2300004: base-X_002
+    2300006: base-X_003
+    2300008: base-X_004
+    2300010: base-X_005
+    2300012: base-X_006
+    2300014: base-X_007
+    2300016: base-X_008
+    2300018: base-X_009
+    2300020: cavern-I
+    2300022: cavern-T
+    2300024: cavern-X
+    2300026: dead-end-T
+    2300028: round-X
+    2300030: square-X
+    2300032: cavern-L
+    2300034: square-X_001
+    2300036: bounds
+    2300038: bounds_001
+    2300040: bounds_002
+    2300042: bounds_003
+    2300044: bounds_004
+    2300046: bounds_005
+    2300048: bounds_006
+    3300000: base-X
+    3300002: base-X_001
+    3300004: base-X_002
+    3300006: base-X_003
+    3300008: base-X_004
+    3300010: base-X_005
+    3300012: base-X_006
+    3300014: base-X_007
+    3300016: base-X_008
+    3300018: base-X_009
+    3300020: cavern-I
+    3300022: cavern-T
+    3300024: cavern-X
+    3300026: dead-end-T
+    3300028: round-X
+    3300030: square-X
+    3300032: cavern-L
+    3300034: square-X_001
+    3300036: bounds
+    3300038: bounds_001
+    3300040: bounds_002
+    3300042: bounds_003
+    3300044: bounds_004
+    3300046: bounds_005
+    3300048: bounds_006
+    4300000: base-X_009
+    4300002: base-X_008
+    4300004: base-X_007
+    4300006: base-X_005
+    4300008: base-X_004
+    4300010: base-X_003
+    4300012: base-X_006
+    4300014: base-X_002
+    4300016: base-X_001
+    4300018: base-X
+    4300020: round-X
+    4300022: square-X
+    4300024: cavern-T
+    4300026: cavern-X
+    4300028: dead-end-T
+    4300030: cavern-I
+    4300032: cavern-L
+    4300034: square-X_001
+    4300036: bounds_002
+    4300038: bounds_006
+    4300040: bounds_004
+    4300042: bounds_001
+    4300044: bounds
+    4300046: bounds_005
+    4300048: bounds_003
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
