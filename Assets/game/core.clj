@@ -67,7 +67,45 @@
   (destroy-immediate (the tiled))
   (make-level 1))
 
+
+(deftween [:camera :size] [this]
+  {:base (.GetComponent this UnityEngine.Camera)
+   :base-tag UnityEngine.Camera
+   :get (.orthographicSize this)
+   :tag System.Single})
+
+(defn menu [_ _]
+  (clear-cloned!)
+  (clone! :menu/sun)
+  (let [world (game.world/make-world "worlds/world.xml" 10 10)
+        camera (clone! :menu/menu-camera)
+        title (clone! :menu/title)
+        newgame (clone! :menu/button)
+        tpos (>v3 title)
+        bpos (>v3 newgame)]
+    (local-scale! title (v3 8))
+    (position! newgame (v3+ tpos (v3 0 -3 0)))
+    (timeline* 
+      (AND 
+        (tween {:camera {:size 2.03}} camera 6.0 :pow4)
+        (tween {:local {:scale (v3 1)}} title 6.0 :pow2)
+        (OR 
+          (wait 5.5)
+          (tween {:position bpos} newgame 0.5 :pow4))))
+    (hook+ newgame :on-mouse-enter (fn [_ _] 
+      (log "enter")
+      (timeline* (tween {:local {:scale (v3 0.29)}} newgame 0.3 :pow2))))
+    (hook+ newgame :on-mouse-exit (fn [_ _] 
+      (log "exit")
+      (timeline* (tween {:local {:scale (v3 0.26)}} newgame 0.3 :pow2))))
+    (hook+ newgame :on-mouse-down (fn [_ _] 
+      (timeline* (wait 0.1) #(do (start nil nil) nil))))))
+
+
 '(start nil nil)
+
+'(menu nil nil)
+
 
 
 ;;Special starting player parts

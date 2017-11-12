@@ -136,8 +136,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98269a5891b3245db82aaf98a8faa9a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  edn: '[{:arcadia.internal.hook-help/key :start, :arcadia.internal.hook-help/fn #''game.core/start,
-    :arcadia.internal.hook-help/pamv-data [:start]}]'
+  edn: '[{:arcadia.internal.hook-help/key :default, :arcadia.internal.hook-help/fn
+    #''game.core/menu, :arcadia.internal.hook-help/pamv-data [:default]}]'
   arcadiaState: {fileID: 24760875}
 --- !u!114 &24760875
 MonoBehaviour:
