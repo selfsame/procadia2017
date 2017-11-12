@@ -17,6 +17,23 @@ ModelImporter:
     100018: body-bone
     100020: blob
     100022: smoke
+    100024: barrell
+    100026: beachball
+    100028: Bone_0
+    100030: Bone_004
+    100032: Bone_005
+    100034: Bone_2
+    100036: Bone_3
+    100038: Bone_4
+    100040: cannon
+    100042: claw
+    100044: double-arm
+    100046: double-neck
+    100048: snake
+    100050: snake-body
+    100052: snake-mesh
+    100054: tank-body
+    100056: eyeball_001
     400000: //RootNode
     400002: Cube
     400004: eyeball
@@ -29,24 +46,72 @@ ModelImporter:
     400018: body-bone
     400020: blob
     400022: smoke
+    400024: barrell
+    400026: beachball
+    400028: Bone_0
+    400030: Bone_004
+    400032: Bone_005
+    400034: Bone_2
+    400036: Bone_3
+    400038: Bone_4
+    400040: cannon
+    400042: claw
+    400044: double-arm
+    400046: double-neck
+    400048: snake
+    400050: snake-body
+    400052: snake-mesh
+    400054: tank-body
+    400056: eyeball_001
     2300000: //RootNode
     2300002: Cube
     2300004: eyeball
     2300006: blob
+    2300008: barrell
+    2300010: beachball
+    2300012: cannon
+    2300014: claw
+    2300016: double-arm
+    2300018: double-neck
+    2300020: snake-body
+    2300022: tank-body
+    2300024: eyeball_001
     3300000: //RootNode
     3300002: Cube
     3300004: eyeball
     3300006: blob
+    3300008: barrell
+    3300010: beachball
+    3300012: cannon
+    3300014: claw
+    3300016: double-arm
+    3300018: double-neck
+    3300020: snake-body
+    3300022: tank-body
+    3300024: eyeball_001
     4300000: eyeball
     4300002: Cube
     4300004: boots
     4300006: blob
     4300008: smoke
+    4300010: snake-body
+    4300012: snake-mesh
+    4300014: tank-body
+    4300016: double-arm
+    4300018: double-neck
+    4300020: claw
+    4300022: cannon
+    4300024: barrell
+    4300026: beachball
+    4300028: eyeball_001
     7400000: Default Take
     7400002: walk
+    7400004: ArmatureAction
+    7400006: snake-slither
     9500000: //RootNode
     13700000: boots
     13700002: smoke
+    13700004: snake-mesh
   materials:
     importMaterials: 1
     materialName: 0

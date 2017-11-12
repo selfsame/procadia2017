@@ -13,6 +13,7 @@
 
 (defn make-world [path w h]
   (let [tiled (clone! :tiled)
+        border (clone! :world-border)
         wfc (.GetComponent tiled "SimpleTiledWFC")]
     (set! (.xmlpath wfc) (str "Resources/" path))
     (set! (.width wfc) (int w))
@@ -20,8 +21,14 @@
     (.Generate wfc)
     (.Run wfc)
     (destroy wfc)
-    ;(set-mask! overlap "level")
+    (parent! border tiled)
+    (local-position! border (v3+ (>v3 tiled) (v3 w h 0) (v3 -1 -1 0)))
+    (local-scale! border (v3 w h 4))
     tiled))
+
+'(do 
+  (clear-cloned!)
+  (game.world/make-world "worlds/world.xml" 10 10))
 
 
 (defn make-overlap-world [k w h]

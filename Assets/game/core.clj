@@ -38,12 +38,14 @@
           (map 
             (fn [sp] 
               (let [monster (game.entity/make-entity (* depth 10))]
-                (position! monster (.position (.transform sp)))
-                (hook+ monster :start :ai #'game.ai/ai-start)
-                (state+ monster :input (input.core/new-control))
-                (set-mask! monster "monster")
-                (state+ monster :mask (int (+ (mask "level") (mask "player"))))
-                monster))
+                (if (< (state monster :power) 1)
+                  (destroy monster)
+                  (do 
+                    (position! monster (.position (.transform sp)))
+                    (hook+ monster :start :ai #'game.ai/ai-start)
+                    (set-mask! monster "monster")
+                    (state+ monster :mask (int (+ (mask "level") (mask "player"))))
+                    monster))))
             (take 30 (rest spawn-points))))
         balls 
         (run! 

@@ -23,7 +23,6 @@
 (defn set-player! [o]
   (reset! PLAYER o)
   (state+ @INPUT :output-obj @PLAYER)
-  (state+ o :input (input.core/new-control))
   (set-mask! o "player")
   (state+ o :mask (int (+ (mask "level") (mask "monster"))))
   (state+ o :hp 30)

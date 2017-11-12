@@ -42,6 +42,8 @@ ModelImporter:
     100068: spawn_008
     100070: spawn_009
     100072: spawn_010
+    100074: bounds_007
+    100076: world-border
     400000: base-X
     400002: base-X_001
     400004: base-X_002
@@ -79,6 +81,8 @@ ModelImporter:
     400068: spawn_008
     400070: spawn_009
     400072: spawn_010
+    400074: bounds_007
+    400076: world-border
     2300000: base-X
     2300002: base-X_001
     2300004: base-X_002
@@ -104,6 +108,8 @@ ModelImporter:
     2300044: bounds_004
     2300046: bounds_005
     2300048: bounds_006
+    2300050: bounds_007
+    2300052: world-border
     3300000: base-X
     3300002: base-X_001
     3300004: base-X_002
@@ -129,6 +135,8 @@ ModelImporter:
     3300044: bounds_004
     3300046: bounds_005
     3300048: bounds_006
+    3300050: bounds_007
+    3300052: world-border
     4300000: base-X_009
     4300002: base-X_008
     4300004: base-X_007
@@ -154,6 +162,8 @@ ModelImporter:
     4300044: bounds
     4300046: bounds_005
     4300048: bounds_003
+    4300050: bounds_007
+    4300052: world-border
     7400000: Default Take
     9500000: //RootNode
   materials:

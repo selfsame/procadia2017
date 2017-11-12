@@ -39,15 +39,17 @@
     (when-let [obj (clone! (:prefab m))]
       (swap! parts conj (assoc m :object obj))
       (state+ obj :procjam/part (or (:state m) {}))
-      (parent! obj mount)
       (position! obj (>v3 mount))
       (rotation! obj (.rotation (.transform mount)))
+      (parent! obj mount)
       (run!
         (fn [[k v]]
           (when-let [mount (child-named obj (name k))]
             (when-let [m (srand-nth (vec (parts-typed (probability v))))]
-              (attach mount m (dec budget) parts))))
-        (:mount-points m)))))
+              (attach mount m (dec budget) parts)
+              (set! (.name mount) (str (gensym (.name mount)))))))
+        (:mount-points m))
+      )))
 
 (defn update-vals [m f]
   (persistent! (reduce-kv (fn [m k v] (assoc! m k (f v))) (transient {}) m)))
@@ -120,9 +122,10 @@
         (state+ root ::ai (if (empty? ai) nil ai)))
       (skin-color! root (color (?f 1)(?f 1)(?f 1)))
       (rotate! root (v3 0 (?f 360) 0))
+      (state+ root :input (input.core/new-control))
       root)))
 
 
 '(do
   (clear-cloned!)
-  (make-entity :feet 20))
+  (position! (make-entity :feet 10) (v3 0 0 10)))

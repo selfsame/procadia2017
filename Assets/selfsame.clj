@@ -38,6 +38,12 @@
     (when (> (.magnitude aim) 0.01) 
       (lerp-look! this (v3+ (>v3 this) aim) 0.4))))
 
+(defn y-look [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
+  (let [input (state o :input)]
+    (when input
+      (look-at! this (v3+ (.target input) (v3 0 5 0)) (v3 0 1 0))
+      (rotate! this (v3 90 0 0)))))
+
 (defn gun-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
   (let [pressed (.pressed (state o :input))
         ^Timer timer (cmpt this Timer)] 
@@ -52,15 +58,49 @@
           (set! (.rotation btrf) (.rotation (.transform this)))
           (timeline*
             (fn [] 
-              (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 20) layer)]
+              (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 25) layer)]
                 (game.play/damage (.gameObject (.collider hit)) 2)
                 (let [spark (clone! :fx/spark)] 
                   (position! spark (.point hit))
                   (destroy spark 0.5))
                 (destroy bullet 0.01))
               (position! bullet 
-                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 20)))))))
+                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 25)))))))
           (destroy bullet 3.0)))))
+
+(defn cannon-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
+  (let [pressed (.pressed (state o :input))
+        ^Timer timer (cmpt this Timer)
+        b (state this :cannon)]
+    (set! (.value timer) (int (+ (.value timer) 1)))
+    (look-at! b (v3+ (.target (state o :input)) (v3 0 1 0)) (v3 0 1 0))
+    (when (and (:fire pressed)
+               (> (.value timer) 40))   
+        (set! (.value timer) (int 0))
+        (let [bullet (clone! :bullets/cannonball)
+              layer (int (state o :mask))
+              ^UnityEngine.Transform btrf (.transform bullet)]
+          (position! bullet (>v3 this))
+          (set! (.rotation btrf) (.rotation (.transform b)))
+          (timeline*
+            (fn [] 
+              (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 20) layer)]
+                (game.play/damage (.gameObject (.collider hit)) 2)
+                (let [smoke (game.fx/smoke (.point hit))] 
+                  (local-scale! smoke (v3 0.7)))
+                (destroy bullet 0.01))
+              (position! bullet 
+                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 20)))))))
+          (let [point (transform-point b (v3 0 -0.2 2))
+                smoke (game.fx/smoke point)]
+            (rotation! smoke (rotation b))
+            (local-scale! smoke (v3 0.4))
+            (timeline*
+              (tween {:local {:scale (v3 1 1 0.5)}} b 0.2 {:out :pow2})
+              (tween {:local {:scale (v3 1 1 1)}} b 0.6 {:in :pow2})))
+          (destroy bullet 3.0)))))
+
+
 
 (part {
   :type :feet
@@ -117,11 +157,12 @@
   :id :eyeball
   :prefab :parts/eyeball
   :hp 2
+  :hooks {:update #'y-look}
   :ai 
   (behaviour [o]
     (NOT (player-in-range? o 40))
     (AND (charge o)
-         (NOT (player-in-range? o 10))
+         (NOT (player-in-range? o 15))
          (wait (?f 0.3 1)))
     (stop o)
     (fire o)
@@ -136,8 +177,7 @@
   :id :tentacle
   :prefab :parts/rag-tentacle-k
   :mount-points {
-    :item {:item 1
-           :nil 1}}})
+    :item {:nil 1}}})
 
 (part {
   :type :item
@@ -149,7 +189,70 @@
     :update #'gun-update}})
 
 
+(part {
+  :type :feet
+  :id :snake-feet
+  :prefab :parts/snake
+  :mount-points {
+    :body {:body 1}} 
+  :hooks {
+    :move #'feet-move}})
 
+(part {
+  :type :body
+  :id :snake
+  :prefab :parts/snake-body
+  :mount-points {
+    :neck {:head 4
+           :arm 1}
+    :left-arm {:arm 1 }
+    :right-arm {:arm 1 }} 
+  :hooks {:update #'body-update}})
+
+
+(part {
+  :type :body
+  :id :tank
+  :prefab :parts/tank-body
+  :hp 3
+  :mount-points {
+    :head {:head 1}
+    :leftarm {:arm 2 :cannon 1}
+    :rightarm {:arm 2 :cannon 1}} 
+  :hooks {:update #'body-update}})
+
+
+(part {
+  :type :arm
+  :id :claw
+  :prefab :parts/claw
+  :mount-points {
+    :item {:item 1}}
+  :hooks {:aim #'game.play/arm-update}})
+
+(part {
+  :type :arm
+  :id :double
+  :prefab :parts/double-arm
+  :mount-points {
+    :arm1 {
+      :arm 4
+      :head 1
+      :nil 1}
+    :arm2 {
+      :arm 4
+      :head 1
+      :nil 1}}})
+
+(part {
+  :type [:cannon :head]
+  :id :tank
+  :prefab :parts/cannon
+  :power 3
+  :hooks {
+    :start (fn [root this] (cmpt+ this Timer)
+      (state+ this :cannon (child-named this "barrell")))
+    :update #'cannon-update}})
 
 
 '(do
