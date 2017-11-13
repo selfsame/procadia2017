@@ -15,7 +15,7 @@
   (let [tiled (clone! :tiled)
         border (clone! :world-border)
         wfc (.GetComponent tiled "SimpleTiledWFC")]
-    (set! (.xmlpath wfc) (str "Resources/" path))
+    (set! (.xml wfc) (resource path))
     (set! (.width wfc) (int w))
     (set! (.depth wfc) (int h))
     (.Generate wfc)

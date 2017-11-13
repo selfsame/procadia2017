@@ -22,7 +22,7 @@
     (set! (>v3 o) 
           (Vector3/Lerp
             (>v3 o)
-            (v3+ (>v3 player) (v3 -50 70 -50))
+            (v3+ (>v3 player) (v3 -20 28 -20))
             0.1)))
   nil)
 
@@ -34,7 +34,7 @@
     (set! (.text swapped) (str (first @SWAPPED) "/" (last @SWAPPED)))))
 
 (defn make-level [depth]
-  (let [world (game.world/make-world "worlds/world.xml" 9 9)
+  (let [world (game.world/make-world "worlds/world" 9 9)
         _ (local-scale! world (v3 20))
         sun (clone! :sun)
         event-system (clone! :EventSystem)
@@ -91,7 +91,7 @@
 (defn menu [_ _]
   (clear-cloned!)
   (clone! :menu/sun)
-  (let [world (game.world/make-world "worlds/world.xml" 10 10)
+  (let [world (game.world/make-world "worlds/world" 10 10)
         camera (clone! :menu/menu-camera)
         title (clone! :menu/title)
         newgame (clone! :menu/button)

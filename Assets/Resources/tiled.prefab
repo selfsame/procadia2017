@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8cf295cc6bf48d39fe0b13564f7858, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xmlpath: tiles.xml
+  xml: {fileID: 4900000, guid: b18e64d0d75764b1a8db75d2181b72b4, type: 3}
   gridsize: 2
   width: 20
   depth: 20
