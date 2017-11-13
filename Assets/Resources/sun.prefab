@@ -49,14 +49,14 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 1
-  m_Color: {r: 0.88235295, g: 0.86911196, b: 0.81098616, a: 1}
+  m_Color: {r: 0.8897059, g: 0.864217, b: 0.7523248, a: 1}
   m_Intensity: 0.9
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2
-    m_Resolution: -1
+    m_Resolution: 3
     m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0

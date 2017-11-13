@@ -58,14 +58,14 @@
           (set! (.rotation btrf) (.rotation (.transform this)))
           (timeline*
             (fn [] 
-              (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 25) layer)]
-                (game.play/damage (.gameObject (.collider hit)) 2)
+              (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 30) layer)]
+                (game.play/damage (.gameObject (.collider hit)) 0.6)
                 (let [spark (clone! :fx/spark)] 
                   (position! spark (.point hit))
                   (destroy spark 0.5))
                 (destroy bullet 0.01))
               (position! bullet 
-                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 25)))))))
+                (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 30)))))))
           (destroy bullet 3.0)))))
 
 (defn cannon-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
@@ -85,7 +85,7 @@
           (timeline*
             (fn [] 
               (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 20) layer)]
-                (game.play/damage (.gameObject (.collider hit)) 2)
+                (game.play/damage (.gameObject (.collider hit)) 3)
                 (let [smoke (game.fx/smoke (.point hit))] 
                   (local-scale! smoke (v3 0.7)))
                 (destroy bullet 0.01))

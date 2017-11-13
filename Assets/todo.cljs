@@ -1,16 +1,16 @@
 
 [need]
-([ ] bounding walls around level)
+([x] bounding walls around level)
 ([ ] player :hp
   ([ ] base + form * player multiplier)
   ([ ] killing things heals a bit)
   ([ ] new form - calc ratio and apply to new max-hp))
-([ ] death
-  ([ ] restart game))
+([x] death
+  ([x] restart game))
 ([ ] win screen)
-([ ] HUD
-  ([ ] hp meter)
-  ([ ] x/y enemies killed))
+([x] HUD
+  ([x] hp meter)
+  ([x] x/y enemies killed))
 ([ ] sound fx
   ([ ] bullet/impact)
   ([ ] form swap)

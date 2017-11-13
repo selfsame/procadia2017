@@ -113,7 +113,7 @@
             {} @parts) #(into-array PartHook %)))
       (hook+ root :start ::start #'entity-start)
       (hook+ root :update ::update #'entity-update)
-      (let [hp (min 4 (reduce #(+ %1 (get %2 :hp 1)) 0 @parts))
+      (let [hp (* 1.5 (min 4 (reduce #(+ %1 (get %2 :hp 1)) 0 @parts)))
             power (reduce #(+ %1 (get %2 :power 0)) 0 @parts)
             ai (vec (mapcat #(if-let [v (get % :ai)] (v root) '()) @parts))]
         (state+ root :hp hp)

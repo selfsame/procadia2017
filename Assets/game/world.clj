@@ -23,7 +23,7 @@
     (destroy wfc)
     (parent! border tiled)
     (local-position! border (v3+ (>v3 tiled) (v3 w h 0) (v3 -1 -1 0)))
-    (local-scale! border (v3 w h 4))
+    (local-scale! border (v3 w h 2))
     tiled))
 
 '(do 

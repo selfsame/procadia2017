@@ -5,3 +5,5 @@
 (defonce CAMERA (atom nil))
 (defonce CAMERA-AXIS (atom nil))
 (defonce AIM (atom nil))
+(defonce MENU (atom nil))
+(defonce SWAPPED (atom nil))

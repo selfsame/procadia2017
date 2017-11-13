@@ -26,27 +26,35 @@
             0.1)))
   nil)
 
+(defn update-canvas [^GameObject o _]
+  (let [health (cmpt (child-named o "health") UnityEngine.UI.Text)
+        swapped (cmpt (child-named o "swapped") UnityEngine.UI.Text)
+        player (state @PLAYER)]
+    (set! (.text health) (str (:hp player) "/" (:max-hp player)))
+    (set! (.text swapped) (str (first @SWAPPED) "/" (last @SWAPPED)))))
+
 (defn make-level [depth]
   (let [world (game.world/make-world "worlds/world.xml" 12 12)
         _ (local-scale! world (v3 20))
         sun (clone! :sun)
+        event-system (clone! :EventSystem)
+        canvas (clone! :Canvas)
         spawn-points (game.world/spawn-points)
         player-input (clone! :player-input)
         player (game.entity/make-entity :player-feet (* depth 10))
         monsters 
-        (dorun 
-          (map 
-            (fn [sp] 
-              (let [monster (game.entity/make-entity (* depth 10))]
-                (if (< (state monster :power) 1)
-                  (destroy monster)
-                  (do 
-                    (position! monster (.position (.transform sp)))
-                    (hook+ monster :start :ai #'game.ai/ai-start)
-                    (set-mask! monster "monster")
-                    (state+ monster :mask (int (+ (mask "level") (mask "player"))))
-                    monster))))
-            (take 30 (rest spawn-points))))
+        (run! 
+          (fn [sp] 
+            (let [monster (game.entity/make-entity (* depth 10))]
+              (if (< (state monster :power) 1)
+                (destroy monster)
+                (do 
+                  (position! monster (.position (.transform sp)))
+                  (hook+ monster :start :ai #'game.ai/ai-start)
+                  (set-mask! monster "monster")
+                  (state+ monster :mask (int (+ (mask "level") (mask "player"))))
+                  monster))))
+          (take 30 (rest spawn-points)))
         balls 
         (run! 
           (fn [spawn] 
@@ -62,7 +70,10 @@
     (game.play/set-player! player)
     (state+ player-input :output-obj player)
     (position! player (.position (.transform (first spawn-points))))
-    (hook+ camera :update #'update-camera)))
+    (hook+ camera :update #'update-camera)
+    (hook+ canvas :update #'update-canvas)
+    (log monsters)
+    (reset! SWAPPED ((juxt identity identity) (dec (count (objects-tagged "entity")))))))
 
 (defn start [_ _]
   (clear-cloned!)
@@ -102,6 +113,7 @@
       (timeline* (tween {:local {:scale (v3 0.26)}} newgame 0.3 :pow2))))
     (hook+ newgame :on-mouse-down (fn [_ _] 
       (timeline* (wait 0.1) #(do (start nil nil) nil))))))
+(reset! MENU menu)
 
 
 '(start nil nil)
