@@ -5,6 +5,7 @@
     hard.core
     hard.physics
     hard.animation
+    hard.sound
     game.entity
     game.data
     tween.core
@@ -18,6 +19,11 @@
     Timer
     [UnityEngine Mathf Time GameObject Vector3]))
 
+(defn color! [o c]
+  (set! (.color (aget (.materials (cmpt o UnityEngine.MeshRenderer)) 0)) c))
+
+(defn trail-color! [o c]
+  (set! (.color (aget (.materials (cmpt o UnityEngine.TrailRenderer)) 0)) c))
 
 (defn feet-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
   (when movement 
@@ -54,12 +60,15 @@
         (let [bullet (clone! :bullets/pellet)
               layer (int (state o :mask))
               ^UnityEngine.Transform btrf (.transform bullet)]
+          (play-clip! (rand-nth ["hurt1" "hurt2"]) {:volume 0.2})
           (position! bullet (>v3 this))
+          (color! bullet (:hue (state o)))
+          (trail-color! bullet (:hue (state o)))
           (set! (.rotation btrf) (.rotation (.transform this)))
           (timeline*
             (fn [] 
               (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 30) layer)]
-                (game.play/damage (.gameObject (.collider hit)) 0.6)
+                (game.play/damage (.gameObject (.collider hit)) 1)
                 (let [spark (clone! :fx/spark)] 
                   (position! spark (.point hit))
                   (destroy spark 0.5))
@@ -67,6 +76,7 @@
               (position! bullet 
                 (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 30)))))))
           (destroy bullet 3.0)))))
+
 
 (defn cannon-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
   (let [pressed (.pressed (state o :input))
@@ -80,14 +90,22 @@
         (let [bullet (clone! :bullets/cannonball)
               layer (int (state o :mask))
               ^UnityEngine.Transform btrf (.transform bullet)]
+          (play-clip! "fire" {:volume 0.4})
           (position! bullet (>v3 this))
           (set! (.rotation btrf) (.rotation (.transform b)))
           (timeline*
             (fn [] 
               (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 20) layer)]
-                (game.play/damage (.gameObject (.collider hit)) 3)
+                (let [found 
+                      (distinct (filter 
+                        #(state % :entity?)
+                        (map 
+                        #(.gameObject (.root (.transform (.gameObject %))))
+                        (overlap-sphere (.point hit) 2.0 layer))))]
+                    (run! #(game.play/damage % 3) found))
                 (let [smoke (game.fx/smoke (.point hit))] 
                   (local-scale! smoke (v3 0.7)))
+                (play-clip! "explosion.wav" {:volume 0.4})
                 (destroy bullet 0.01))
               (position! bullet 
                 (v3+ (>v3 bullet) (local-direction bullet (v3 0 0 (∆ 20)))))))

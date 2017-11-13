@@ -28,7 +28,7 @@
 
 '(do 
   (clear-cloned!)
-  (game.world/make-world "worlds/world.xml" 10 10))
+  (game.world/make-world "worlds/world.xml" 2 2))
 
 
 (defn make-overlap-world [k w h]

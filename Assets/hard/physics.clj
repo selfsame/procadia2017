@@ -89,3 +89,7 @@
 (defn overlap-circle 
   ([p r] (Physics2D/OverlapCircle p (float r)))
   ([p r m] (Physics2D/OverlapCircle p (float r) m) ))
+
+(defn overlap-sphere 
+  ([p r] (Physics/OverlapSphere p (float r)))
+  ([p r m] (Physics/OverlapSphere p (float r) m) ))

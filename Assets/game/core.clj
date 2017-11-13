@@ -30,11 +30,11 @@
   (let [health (cmpt (child-named o "health") UnityEngine.UI.Text)
         swapped (cmpt (child-named o "swapped") UnityEngine.UI.Text)
         player (state @PLAYER)]
-    (set! (.text health) (str (:hp player) "/" (:max-hp player)))
+    (set! (.text health) (str (int (:hp player)) "/" (:max-hp player)))
     (set! (.text swapped) (str (first @SWAPPED) "/" (last @SWAPPED)))))
 
 (defn make-level [depth]
-  (let [world (game.world/make-world "worlds/world.xml" 12 12)
+  (let [world (game.world/make-world "worlds/world.xml" 9 9)
         _ (local-scale! world (v3 20))
         sun (clone! :sun)
         event-system (clone! :EventSystem)
@@ -73,7 +73,8 @@
     (hook+ camera :update #'update-camera)
     (hook+ canvas :update #'update-canvas)
     (log monsters)
-    (reset! SWAPPED ((juxt identity identity) (dec (count (objects-tagged "entity")))))))
+    (reset! SWAPPED ((juxt identity identity) (dec (count (objects-tagged "entity")))))
+    (set! (>v3 camera) (v3+ (>v3 player) (v3 -50 70 -50)))))
 
 (defn start [_ _]
   (clear-cloned!)
