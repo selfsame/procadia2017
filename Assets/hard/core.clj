@@ -323,7 +323,14 @@
 
 (defmacro ?rotation [] `(~'UnityEngine.Random/rotation))
 
-
+;thanks @nasser
+(defmacro foreach [[local-sym arr] & body]
+  `(let [len# (.Length ~arr)]
+     (loop [i# (int 0)]
+       (when (< i# len#)
+         (let [~local-sym (aget ~arr i#)]
+           ~@body
+           (recur (inc i#)))))))
 
 (defmacro ? [& body]
   (if (> 4 (count body))
