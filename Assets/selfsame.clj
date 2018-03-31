@@ -53,15 +53,14 @@
 (defn gun-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
   (let [pressed (.pressed (state o :input))
         ^Timer timer (cmpt this Timer)] 
-    (set! (.value timer) (int (+ (.value timer) 1)))
+    (set! (.value timer) (int (+ (.value timer) (∆ 30))))
     (when (and (:fire pressed)
                (> (.value timer) 10))   
         (set! (.value timer) (int 0))
-        (let [bullet (clone! :bullets/pellet)
+        (let [bullet (-clone! :bullets/pellet (>v3 this))
               layer (int (state o :mask))
               ^UnityEngine.Transform btrf (.transform bullet)]
           (play-clip! (rand-nth ["hurt1" "hurt2"]) {:volume 0.2})
-          (position! bullet (>v3 this))
           (color! bullet (:hue (state o)))
           (trail-color! bullet (:hue (state o)))
           (set! (.rotation btrf) (.rotation (.transform this)))
@@ -82,7 +81,7 @@
   (let [pressed (.pressed (state o :input))
         ^Timer timer (cmpt this Timer)
         b (state this :cannon)]
-    (set! (.value timer) (int (+ (.value timer) 1)))
+    (set! (.value timer) (int (+ (.value timer) (∆ 30))))
     (look-at! b (v3+ (.target (state o :input)) (v3 0 1 0)) (v3 0 1 0))
     (when (and (:fire pressed)
                (> (.value timer) 40))   
@@ -98,7 +97,7 @@
               (when-let [hit (hit (>v3 bullet) (.forward btrf) (∆ 20) layer)]
                 (let [found 
                       (distinct (filter 
-                        #(state % :entity?)
+                        #(try (state % :entity?) (catch Exception e))
                         (map 
                         #(.gameObject (.root (.transform (.gameObject %))))
                         (overlap-sphere (.point hit) 2.0 layer))))]
@@ -118,6 +117,19 @@
               (tween {:local {:scale (v3 1 1 1)}} b 0.6 {:in :pow2})))
           (destroy bullet 3.0)))))
 
+
+(defn tank-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
+  (when movement 
+    (let [last-vel (or (state this ::move) (v3 0))
+          movement (v3* (v3+ movement last-vel) 0.5)
+          rb (->rigidbody o)
+          vel (v3+ (v3* movement 12) (v3 0 (.y (.velocity rb)) 0))
+          speed (* (.magnitude movement) 7)
+          tank-dir (v3* (.forward (.transform this)) speed)]
+      (state+ this ::move movement)
+      (set! (.velocity rb) tank-dir)
+      (when (> (.magnitude movement) 0.001)
+        (lerp-look! this (v3+ (>v3 this) movement) 0.07)))))
 
 
 (part {
@@ -238,6 +250,24 @@
     :leftarm {:arm 2 :cannon 1}
     :rightarm {:arm 2 :cannon 1}} 
   :hooks {:update #'body-update}})
+
+(part {
+  :type :feet
+  :id :tank
+  :hp 3
+  :prefab :parts/tank
+  :mount-points {
+    :body {:body 1}} 
+  :hooks {
+    :move #'tank-move}
+  :ai   (behaviour [o]
+    (NOT (player-in-range? o 40))
+    (fire o)
+    (AND (strafe o (rand-nth [-1 1]))
+         (aim o)
+         (wait (?f 0.6 1.2)))
+    (end-fire o)
+    (stop o))})
 
 
 (part {

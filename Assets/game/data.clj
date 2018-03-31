@@ -7,3 +7,4 @@
 (defonce AIM (atom nil))
 (defonce MENU (atom nil))
 (defonce SWAPPED (atom nil))
+(defonce SIZE (atom 0))
