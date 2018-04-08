@@ -57,7 +57,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: e80147e9823a24d9eb27b0a9a6598992, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 0e532c76f04f64c23adc8de513a0a920, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.2
   m_Pitch: 1
@@ -128,6 +128,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  m_ExtensionPropertyValues: []
 --- !u!82 &82370328346192332
 AudioSource:
   m_ObjectHideFlags: 1
@@ -208,6 +209,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  m_ExtensionPropertyValues: []
 --- !u!82 &82539037676782576
 AudioSource:
   m_ObjectHideFlags: 1
@@ -288,6 +290,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  m_ExtensionPropertyValues: []
 --- !u!82 &82690358320011008
 AudioSource:
   m_ObjectHideFlags: 1
@@ -368,6 +371,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  m_ExtensionPropertyValues: []
 --- !u!82 &82843141423362118
 AudioSource:
   m_ObjectHideFlags: 1
@@ -448,6 +452,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  m_ExtensionPropertyValues: []
 --- !u!82 &82943649161000780
 AudioSource:
   m_ObjectHideFlags: 1
@@ -528,6 +533,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  m_ExtensionPropertyValues: []
 --- !u!82 &82989872422888878
 AudioSource:
   m_ObjectHideFlags: 1
@@ -608,6 +614,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  m_ExtensionPropertyValues: []
 --- !u!114 &114113574280374396
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -38,6 +38,21 @@
       (when (> (.magnitude movement) 0.001)
         (lerp-look! this (v3+ (>v3 this) movement) 0.2)))))
 
+(defn ball-move [^UnityEngine.GameObject o ^UnityEngine.GameObject this movement] 
+  (when movement 
+    (let [last-vel (or (state this ::move) (v3 0))
+          movement (v3+ (v3* movement 0.03) last-vel)
+          movement (if (> (.magnitude movement) 1.0) (.normalized movement) movement)
+          rb (->rigidbody o)
+          vel (v3+ (v3* movement 12) (v3 0 (.y (.velocity rb)) 0))
+          speed (.magnitude movement)]
+      (state+ this ::move movement)
+      (set! (.velocity rb) vel)
+      (let [bball (.GetChild (.transform this) 1)]
+        (.Rotate bball (v3 (∆ (* (.magnitude movement) 180)) 0 0)))
+      (when (> (.magnitude movement) 0.001)
+        (.LookAt (.transform this) (v3+ (>v3 this) movement))))))
+
 (defn body-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
   (let [input (state o :input)
         ^Vector3 aim (.aim input)]
@@ -53,9 +68,9 @@
 (defn gun-update [^UnityEngine.GameObject o ^UnityEngine.GameObject this]
   (let [pressed (.pressed (state o :input))
         ^Timer timer (cmpt this Timer)] 
-    (set! (.value timer) (int (+ (.value timer) (∆ 30))))
+    (set! (.value timer) (+ (.value timer) (* (∆ 30) 100)))
     (when (and (:fire pressed)
-               (> (.value timer) 10))   
+               (> (.value timer) 1300))   
         (set! (.value timer) (int 0))
         (let [bullet (-clone! :bullets/pellet (>v3 this))
               layer (int (state o :mask))
@@ -81,10 +96,10 @@
   (let [pressed (.pressed (state o :input))
         ^Timer timer (cmpt this Timer)
         b (state this :cannon)]
-    (set! (.value timer) (int (+ (.value timer) (∆ 30))))
+    (set! (.value timer) (+ (.value timer) (* (∆ 30) 100)))
     (look-at! b (v3+ (.target (state o :input)) (v3 0 1 0)) (v3 0 1 0))
     (when (and (:fire pressed)
-               (> (.value timer) 40))   
+               (> (.value timer) 4000))   
         (set! (.value timer) (int 0))
         (let [bullet (clone! :bullets/cannonball)
               layer (int (state o :mask))
@@ -141,6 +156,26 @@
            :blob 1}} 
   :hooks {
     :move #'feet-move}})
+
+(part {
+  :type :feet
+  :id :clown
+  :prefab :parts/beachball
+  :mount-points {
+    :body {:body 1}} 
+  :hooks {
+    :move #'ball-move}})
+
+(part {
+  :type :feet
+  :id :clown2
+  :prefab :parts/beachball-arms
+  :mount-points {
+    :body {:body 1}
+    :left-arm {:arm 1 :tentacle 1}
+    :right-arm {:arm 1 :tentacle 1}} 
+  :hooks {
+    :move #'ball-move}})
 
 (part {
   :type :body

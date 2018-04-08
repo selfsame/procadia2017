@@ -42,14 +42,8 @@
    (GL/PushMatrix)
    (GL/LoadPixelMatrix 0 w h 0)
    (Graphics/DrawTexture (Rect. x y (.width t) (.height t)) t)
-
    (GL/PopMatrix)
-   (set! RenderTexture/active nil)
-
-   ;(.SetPixel rt 1 1 (color 0 0 0 0))
-   ))
-
-(.SetPixel (UnityEngine.Texture2D. 10 10) 1 1 (color 0 0 0 0))
+   (set! RenderTexture/active nil)))
 
 
 (defn clear-texture [rt c]
@@ -57,16 +51,13 @@
     (draw-texture rt white 0 0)))
 
 
-(defn reveal-map [rt]
-  (let [dim 20
+(defn reveal-map [rt vt]
+  (let [dim (.width vt)
         half-dim (* dim 0.5)
-        view (blank-render-texture dim dim (color 1 1 1 1))
         p (e->ui-v2 @PLAYER)
         x (- (.x p) half-dim)
         y (- (- (.y p)) half-dim)]
-    (draw-texture rt view x y)
-    ;(clear-texture rt nil)
-    ))
+    (draw-texture rt vt x y)))
 
 
 
@@ -85,34 +76,46 @@
 
 
 ;TODO magic
-(defn draw-blips [minimap]
+(defn draw-blips [bt o]
   (let [entities (objects-tagged "entity")
-        blips (objects-tagged "blip")]
-  (dotimes [i (count blips)]
-    (if (< i (count entities))
+        g (state o :green-blip)
+        r (state o :red-blip)
+        ct (state o :ct)]  
+    (draw-texture bt ct 0 0)
+    (dotimes [i (count entities)]
       (let [e (aget entities i)
-            b (aget blips i)
             p (e->ui-v2 e)]
         (if (= e @PLAYER)
-            (set! (.color (cmpt b UnityEngine.UI.Image)) (color 0 1 0))
-            (set! (.color (cmpt b UnityEngine.UI.Image)) (color 1 0 0)))
-          (set! (.anchoredPosition (.transform b)) p))
-      (set! (.anchoredPosition (.transform (aget blips i))) (v2 300 300))))))
+            (draw-texture bt g (.x p) (- (.y p)))
+            (draw-texture bt r (.x p) (- (.y p))))))))
 
 (defn update-canvas [^GameObject o _]
   (let [health (cmpt (child-named o "health") UnityEngine.UI.Text)
         swapped (cmpt (child-named o "swapped") UnityEngine.UI.Text)
-        minimap (child-named o "map")
+        level (cmpt (child-named o "level") UnityEngine.UI.Text)
+        minimap (child-named o "mapimage")
         player (state @PLAYER)]
     (set! (.text health) (str (int (:hp player)) "/" (:max-hp player)))
     (set! (.text swapped) (str (first @SWAPPED) "/" (last @SWAPPED)))
-    (draw-blips minimap)
-    (reveal-map (state o :rt))))
+    (set! (.text level) (str (inc @LEVEL)))
+    (draw-blips (state o :bt) o)
+    (reveal-map (state o :rt) (state o :vt))
+    (when (= 0 (first @SWAPPED))
+      (swap! LEVEL inc)
+      (start nil nil))))
 
+
+(defn monster-of-power [p]
+  (let [m (game.entity/make-entity 200)]
+    (if (>= p (state m :power) 1)
+      m
+      (do (log "bad:" m)
+          (destroy m)
+          (monster-of-power p)))))
 
 
 (defn make-level 
-  ([depth] (make-level depth 10 30))
+  ([depth] (make-level depth 10 50))
   ([depth dim entity-cnt]
     (let [world (game.world/make-world "worlds/world" dim dim)
           _ (local-scale! world (v3 20))
@@ -122,19 +125,16 @@
           canvas (clone! :Canvas)
           spawn-points (game.world/spawn-points)
           player-input (clone! :player-input)
-          player (game.entity/make-entity :player-feet (* depth 10))
-          monsters 
-          (run! 
+          player (game.entity/make-entity :player-feet 200)
+          monsters         
+          (mapv 
             (fn [sp] 
-              (let [monster (game.entity/make-entity (* depth 10))]
-                (if (< (state monster :power) 1)
-                  (destroy monster)
-                  (do 
-                    (position! monster (.position (.transform sp)))
-                    (hook+ monster :start :ai #'game.ai/ai-start)
-                    (set-mask! monster "monster")
-                    (state+ monster :mask (int (+ (mask "level") (mask "player"))))
-                    monster))))
+              (let [monster (monster-of-power depth)] 
+                (position! monster (.position (.transform sp)))
+                (hook+ monster :start :ai #'game.ai/ai-start)
+                (set-mask! monster "monster")
+                (state+ monster :mask (int (+ (mask "level") (mask "player"))))
+                monster))
             (take entity-cnt (rest spawn-points)))
           balls 
           (run! 
@@ -142,14 +142,21 @@
               (let [ball (clone! :prisoner-ball)]
                 (position! ball (v3+ (>v3 spawn) (v3 0 2 0)))))
             (take 20 (drop 31 spawn-points)))
-          blips 
-          (let [minimap (child-named canvas "map")]
-            (dotimes [i (inc entity-cnt)]
-              (.SetParent (.transform (clone! :blip)) (.transform minimap))))
           camera (clone! :iso-camera)
-          rt (blank-render-texture 128 128 (color 0 0 0 1))]
+          rt (blank-render-texture 128 128 (color 0 0 0 1))
+          bt (blank-render-texture 128 128 (color 0 0 0 1))
+          vt (blank-render-texture 30 30 (color 1 1 1 1))
+          ct (blank-render-texture 128 128 (color 0 0 0 1))
+          green-blip (blank-render-texture 4 4 (color 0 1 0))
+          red-blip (blank-render-texture 4 4 (color 1 0 0))]
       (state+ canvas :rt rt)
+      (state+ canvas :bt bt)
+      (state+ canvas :vt vt)
+      (state+ canvas :ct ct)
+      (state+ canvas :green-blip green-blip)
+      (state+ canvas :red-blip red-blip)
       (.SetTexture (.material (cmpt (child-named canvas "reveal") UnityEngine.UI.Image)) "_MainTex" rt)
+      (.SetTexture (.material (cmpt (child-named canvas "blips") UnityEngine.UI.Image)) "_MainTex" bt)
       (set! (.orthographicSize (cmpt mapcam UnityEngine.Camera)) (float (* dim 21.5)))
       (reset! SIZE dim)
       (reset! INPUT player-input)
@@ -163,13 +170,16 @@
       (hook+ camera :update #'update-camera)
       (hook+ canvas :update #'update-canvas)
       (log monsters)
-      (reset! SWAPPED ((juxt identity identity) (dec (count (objects-tagged "entity")))))
+      (reset! SWAPPED ((juxt identity identity) (count monsters)))
       (set! (>v3 camera) (v3+ (>v3 player) (v3 -50 70 -50))))))
 
 (defn start [_ _]
+  (let [l @game.data/LEVEL
+        [depth size cnt] (get game.data/levels l [100 7 30])]
   (clear-cloned!)
   (destroy-immediate (the tiled))
-  (make-level 1))
+  (make-level depth size cnt)))
+
 
 
 (deftween [:camera :size] [this]
@@ -181,6 +191,7 @@
 (defn menu [_ _]
   (clear-cloned!)
   (clone! :menu/sun)
+  (reset! LEVEL 0)
   (let [world (game.world/make-world "worlds/world" 10 10)
         camera (clone! :menu/menu-camera)
         title (clone! :menu/title)
@@ -212,11 +223,14 @@
 '(do
   (clear-cloned!)
   (destroy-immediate (the tiled))
-  (make-level 1 5 0))
+  (make-level 100 7 1))
 
 '(menu nil nil)
 
+'(timeline* :loop
 
+  (fn [] (start nil nil) nil)
+  (wait 10))
 
 ;;Special starting player parts
 

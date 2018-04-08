@@ -43,3 +43,7 @@
 ([ ] better sound FX)
 ([ ] shoot prisoner spheres to move
   ([ ] bullet/wall sound))
+
+[bugs]
+([ ] can't reliably shoot when there's no enemies)
+([ ] entities not starting on spawn points)

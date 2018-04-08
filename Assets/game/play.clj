@@ -55,7 +55,7 @@
       (rotation! new-player prot)
       (kino-settle new-player nil)
       (set-player! new-player)
-      (swap! SWAPPED assoc 0 (dec (count (objects-tagged "entity"))))
+      (swap! SWAPPED update 0 dec)
       (play-clip! "swap")
       (play-clip! "dudud" {:volume 0.2}))))
 
